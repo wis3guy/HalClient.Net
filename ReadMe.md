@@ -46,7 +46,7 @@ The object graph returned by the client is a generic representation of the objec
 
 Caching the root response
 -------------------------
-Most HAL based API's expose their entry points as links in the root response. In order to embrace this paradigm, it is possible to have the `HalHttpClientFactory` retrieve and cache the root response for future reference. The factory will the set the root response on ech created client so it is easily accessible to, for example, extension methods.
+Most HAL based API's expose their entry points as links in the root response. In order to embrace this paradigm, it is possible to have the `HalHttpClientFactory` retrieve and cache the root response for future reference. The factory will the set the root response on each created client so it is easily accessible to, for example, extension methods.
 
 ```c#
 //
@@ -68,7 +68,7 @@ using (var client = factory.CreateClientWithRoot(new Uri("http://api.example.com
 
 More control
 ------------
-When you often need to interact with a specific API, specifying full uri's can become a pain. Also, you might want to have some more control over the way the client behaves. In such cases you can create a specific factory:
+If you frequently need to interact with a specific API, specifying full uri's can become a pain and especially error prone. Also, you might want to have some more control over the way the client behaves. In such cases you can create a specific factory:
 
 ```c#
 public class SpecificApiCLientFactory : HalHttpClientFactory
@@ -93,11 +93,11 @@ public class SpecificApiCLientFactory : HalHttpClientFactory
 }
 ```
 
-Note: The `CreateClientWithRoot()` method is also available on your custom factories. If you set the client's `BaseAddress` property in the `Configure()` method, you should use the overload that does not take the base address as a parameter though. 
+In case you set the client's `BaseAddress` property in the `Configure()` method of your factory, use the overload of `CreateClientWithRoot()` which does not require the base address as a parameter. 
 
 Work in progress
 ----------------
-This library has spawned from an adhoc need i had to communicate with a certain API. As such it was developed until the point that it served my particular needs. It may not suit your particular use cases. Feel free to file an Issue or even a Pull Request if you run into something.   
+This library has spawned from an adhoc need i had to communicate with one of y own API's. As such it has been developed up until the point where it met my particular needs. It may not suit all of your use cases. If so, feel free to file an Issue or even a Pull Request.
 
 Credits
 -------

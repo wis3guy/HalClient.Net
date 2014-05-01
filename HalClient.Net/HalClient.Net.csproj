@@ -49,6 +49,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IHalHttpClientWithRoot.cs" />
+    <Compile Include="IHalHttpClientWithRootFactory.cs" />
     <Compile Include="Parser\EmbeddedResourceObject.cs" />
     <Compile Include="Parser\IEmbeddedResourceObject.cs" />
     <Compile Include="Parser\ILinkObject.cs" />

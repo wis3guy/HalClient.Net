@@ -7,7 +7,7 @@ using HalClient.Net.Parser;
 
 namespace HalClient.Net
 {
-    public class HalHttpClient : IHalHttpClientConfiguration, IHalHttpClient
+    internal class HalHttpClient : IHalHttpClientConfiguration, IHalHttpClientWithRoot
     {
         private readonly IHalJsonParser _parser;
         private HttpClient _client;
@@ -120,5 +120,7 @@ namespace HalClient.Net
             _client.Dispose();
             _client = null;
         }
+
+        public IRootResourceObject Root { get; set; }
     }
 }

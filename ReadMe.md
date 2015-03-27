@@ -42,6 +42,20 @@ using (var client = factory.CreateClient())
 
 Note that the client is disposable!
 
+When testing, you can also do:
+
+```c#
+var factory = new HalHttpClientFactory(new HalJsonParser());
+
+using (var server = Microsoft.Owin.Testing.TestServer.Create<Startup>())
+using (var client = factory.CreateClient(server.HttpClient))
+{
+    var customers = await client.GetAsync(new Uri("http://mytestserver/customers/7809"));
+}
+```
+
+Note how we inject the test-`HttpClient` into the factory method.
+
 The object graph returned by the client is a generic representation of the object, that makes contained data elements easy to traverse/access. Given the flexibility of JSON and the pace at which API's change these days, this strategy was chosen over ORM-like object mapping. You could (relatively) easily build that in a wrapper class specific in your own codebase though.
 
 Caching the root response

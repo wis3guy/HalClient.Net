@@ -1,4 +1,5 @@
-﻿using HalClient.Net.Parser;
+﻿using System.Net.Http;
+using HalClient.Net.Parser;
 using Xunit;
 
 namespace HalClient.Net.Tests
@@ -11,6 +12,16 @@ namespace HalClient.Net.Tests
         public void CreateClient_CreatesAClient()
         {
             using (var client = _target.CreateClient())
+            {
+                Assert.NotNull(client);
+            }
+        }
+
+        [Fact]
+        public void CreateClient_WithHttpClient()
+        {
+            using (var httpClient = new HttpClient())
+            using (var client = _target.CreateClient(httpClient))
             {
                 Assert.NotNull(client);
             }

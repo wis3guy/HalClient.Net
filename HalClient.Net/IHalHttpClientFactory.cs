@@ -1,7 +1,9 @@
-﻿namespace HalClient.Net
+﻿using System.Net.Http;
+
+namespace HalClient.Net
 {
     public interface IHalHttpClientFactory
     {
-        IHalHttpClient CreateClient();
+        IHalHttpClient CreateClient(HttpClient httpClient = null);
     }
 }

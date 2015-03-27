@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using HalClient.Net.Parser;
 
@@ -23,9 +24,9 @@ namespace HalClient.Net
             // Do nothing by default ...
         }
 
-        public IHalHttpClient CreateClient()
+        public IHalHttpClient CreateClient(HttpClient httpClient)
         {
-            return CreateHalHttpClient();
+            return CreateHalHttpClient(httpClient);
         }
 
         public IHalHttpClientWithRoot CreateClientWithRoot(bool refresh = false)
@@ -70,9 +71,9 @@ namespace HalClient.Net
             }
         }
 
-        private HalHttpClient CreateHalHttpClient()
+        private HalHttpClient CreateHalHttpClient(HttpClient httpClient = null)
         {
-            var client = new HalHttpClient(_parser);
+            var client = new HalHttpClient(_parser, httpClient);
 
             try
             {

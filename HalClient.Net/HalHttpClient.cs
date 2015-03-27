@@ -12,11 +12,11 @@ namespace HalClient.Net
         private readonly IHalJsonParser _parser;
         private HttpClient _client;
 
-        internal HalHttpClient(IHalJsonParser parser)
+        internal HalHttpClient(IHalJsonParser parser, HttpClient client)
         {
             if (parser == null) throw new ArgumentNullException("parser");
             _parser = parser;
-            _client = new HttpClient(new HttpClientHandler {AllowAutoRedirect = false});
+            _client = client ?? new HttpClient(new HttpClientHandler { AllowAutoRedirect = false });
         }
 
         public Uri BaseAddress

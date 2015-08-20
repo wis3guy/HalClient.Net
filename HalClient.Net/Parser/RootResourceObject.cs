@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using HalClient.Net.External;
+
+using Tavis.UriTemplates;
 
 namespace HalClient.Net.Parser
 {

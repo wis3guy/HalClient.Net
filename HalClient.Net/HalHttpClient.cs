@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -14,7 +16,9 @@ namespace HalClient.Net
 
         internal HalHttpClient(IHalJsonParser parser, HttpClient client)
         {
-            if (parser == null) throw new ArgumentNullException("parser");
+            if (parser == null)
+                throw new ArgumentNullException("parser");
+
             _parser = parser;
             _client = client ?? new HttpClient(new HttpClientHandler { AllowAutoRedirect = false });
         }
@@ -85,14 +89,28 @@ namespace HalClient.Net
                 (response.StatusCode == HttpStatusCode.RedirectMethod))
                 return await GetAsync(response.Headers.Location);
 
+            IEnumerable<string> contentTypes;
+
+            if (response.Headers.TryGetValues("Content-Type", out contentTypes))
+            {
+                if (contentTypes.First().Equals("application/hal+json", StringComparison.OrdinalIgnoreCase))
+                {
+                    if (response.StatusCode == HttpStatusCode.NoContent)
+                        return new RootResourceObject(response.StatusCode);
+
+                    var json = await response.Content.ReadAsStringAsync();
+                    var result = _parser.Parse(json);
+
+                    return new RootResourceObject(response.StatusCode, result);
+                }
+            }
+
             response.EnsureSuccessStatusCode();
 
-            if (response.StatusCode == HttpStatusCode.NoContent)
-                return new RootResourceObject();
+            if (contentTypes != null)
+                throw new NotSupportedException("The response containes an unsupported 'Content-Type' header value: " + contentTypes.First());
 
-            var json = await response.Content.ReadAsStringAsync();
-
-            return _parser.ParseResource(json);
+            throw new NotSupportedException("The response is missing the 'Content-Type' header");
         }
 
         private void ResetAcceptHeader()

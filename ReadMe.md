@@ -99,9 +99,9 @@ Value | Description
 `Always` | Parse the response from the API, regardless the HTTP status code.
 `SuccessOnly` | Only parse the response from the API in case of a success HTTP status code.
 
-Note that an exception will be thrown in case the `Content-Type` of the response is not `application/hal+json` and the client is tries to parse the response.
+Note that, regardless the HTTP status code, an exception will be thrown in case the `Content-Type` of the response is not `application/hal+json` and the client is tries to parse the response.
 
-Setting the value to `Always` is only useful when communicating with API's that return error description in the HAL mediatype format.
+Setting the value to `Always` is only useful when communicating with API's that return error messages in the HAL mediatype format. Consuming code can no longer rely on an exception being thrown upon receipt of an error response. Instead, the calling code should inspect the `StatusCode` property of the returned `IRootResourceObject` instances and act accordingly.
 
 ##Using a custom `HttpClient`
 If you require a custom `HttpClient` to be wrapped by the `IHalClient` instance, you can provide it to the factory method, like so:

@@ -49,6 +49,8 @@ namespace HalClient.Net
             get { return _client.DefaultRequestHeaders; }
         }
 
+        public bool ParseNonSuccessResponse { get; set; }
+
         public async Task<IRootResourceObject> PostAsync<T>(Uri uri, T data)
         {
             ResetAcceptHeader();
@@ -92,6 +94,9 @@ namespace HalClient.Net
                 (response.StatusCode == HttpStatusCode.RedirectMethod))
                 return await GetAsync(response.Headers.Location);
 
+            if (!ParseNonSuccessResponse)
+                response.EnsureSuccessStatusCode();
+
             IEnumerable<string> contentTypes;
 
             if (response.Headers.TryGetValues("Content-Type", out contentTypes))
@@ -106,14 +111,14 @@ namespace HalClient.Net
 
                     return new RootResourceObject(response.StatusCode, result);
                 }
+
+                if (contentTypes != null)
+                    throw new NotSupportedException("The response containes an unsupported 'Content-Type' header value: " + contentTypes.First());
+
+                throw new NotSupportedException("The response is missing the 'Content-Type' header");
             }
 
-            response.EnsureSuccessStatusCode();
-
-            if (contentTypes != null)
-                throw new NotSupportedException("The response containes an unsupported 'Content-Type' header value: " + contentTypes.First());
-
-            throw new NotSupportedException("The response is missing the 'Content-Type' header");
+            return null; // unreachable code, needed to satisfy the compiler
         }
 
         private void ResetAcceptHeader()

@@ -109,11 +109,11 @@ namespace HalClient.Net
             if (ParseBehavior == ResponseParseBehavior.SuccessOnly)
                 response.EnsureSuccessStatusCode();
 
-            IEnumerable<string> contentTypes;
-
-            if (response.Headers.TryGetValues("Content-Type", out contentTypes))
+            if (response.Content.Headers.ContentType != null)
             {
-                if (contentTypes.First().Equals("application/hal+json", StringComparison.OrdinalIgnoreCase))
+                var mediaType = response.Content.Headers.ContentType.MediaType;
+
+                if (mediaType.Equals("application/hal+json", StringComparison.OrdinalIgnoreCase))
                 {
                     if (response.StatusCode == HttpStatusCode.NoContent)
                         return new RootResourceObject(response.StatusCode);
@@ -124,13 +124,10 @@ namespace HalClient.Net
                     return new RootResourceObject(response.StatusCode, result);
                 }
 
-                if (contentTypes != null)
-                    throw new NotSupportedException("The response containes an unsupported 'Content-Type' header value: " + contentTypes.First());
-
-                throw new NotSupportedException("The response is missing the 'Content-Type' header");
+                throw new NotSupportedException("The response contains an unsupported 'Content-Type' header value: " + mediaType);
             }
 
-            return null; // unreachable code, needed to satisfy the compiler
+            throw new NotSupportedException("The response is missing the 'Content-Type' header");
         }
 
         private void ResetAcceptHeader()

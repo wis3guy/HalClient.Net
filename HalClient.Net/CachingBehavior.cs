@@ -3,7 +3,7 @@ namespace HalClient.Net
 	public enum CachingBehavior
 	{
 		Never,
-		OncePerClient,
+		PerClient,
 		Once
 	}
 }

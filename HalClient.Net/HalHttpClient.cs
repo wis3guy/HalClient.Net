@@ -50,7 +50,7 @@ namespace HalClient.Net
         }
 
         public ResponseParseBehavior ParseBehavior { get; set; }
-        public CachingBehavior RootCachingBehavior { get; set; }
+        public CachingBehavior ApiRootResourceCachingBehavior { get; set; }
 
         public async Task<IRootResourceObject> PostAsync<T>(Uri uri, T data)
         {

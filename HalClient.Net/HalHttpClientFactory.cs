@@ -33,14 +33,14 @@ namespace HalClient.Net
             {
                 Configure(client);
 
-                if (client.RootCachingBehavior != CachingBehavior.Never)
+                if (client.ApiRootResourceCachingBehavior != CachingBehavior.Never)
                 {
-                    switch (client.RootCachingBehavior)
+                    switch (client.ApiRootResourceCachingBehavior)
                     {
                         case CachingBehavior.Once:
                             client.CachedApiRootResource = GetCachedRootResource(client);
                             break;
-                        case CachingBehavior.OncePerClient:
+                        case CachingBehavior.PerClient:
                             client.CachedApiRootResource = GetFreshRootResource(client);
                             break;
                     }

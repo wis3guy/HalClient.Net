@@ -10,6 +10,6 @@ namespace HalClient.Net
         TimeSpan Timeout { get; set; }
         HttpRequestHeaders Headers { get; }
         ResponseParseBehavior ParseBehavior { get; set; }
-        CachingBehavior RootCachingBehavior { get; set; }
+        CachingBehavior ApiRootResourceCachingBehavior { get; set; }
     }
 }

@@ -9,7 +9,7 @@ using HalClient.Net.Parser;
 
 namespace HalClient.Net
 {
-    internal class HalHttpClient : IHalHttpClientConfiguration, IHalHttpClientWithRoot
+    internal class HalHttpClient : IHalHttpClientConfiguration, IHalHttpClient
     {
         private readonly IHalJsonParser _parser;
         private HttpClient _client;
@@ -50,6 +50,7 @@ namespace HalClient.Net
         }
 
         public ResponseParseBehavior ParseBehavior { get; set; }
+        public CachingBehavior RootCachingBehavior { get; set; }
 
         public async Task<IRootResourceObject> PostAsync<T>(Uri uri, T data)
         {
@@ -86,6 +87,8 @@ namespace HalClient.Net
 
             return await ProcessResponseMessage(response);
         }
+
+        public IRootResourceObject CachedApiRootResource { get; set; }
 
         private async Task<IRootResourceObject> ProcessResponseMessage(HttpResponseMessage response)
         {
@@ -146,7 +149,5 @@ namespace HalClient.Net
             _client.Dispose();
             _client = null;
         }
-
-        public IRootResourceObject Root { get; set; }
     }
 }

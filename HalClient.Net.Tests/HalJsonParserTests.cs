@@ -53,12 +53,12 @@ namespace HalClient.Net.Tests
     }
 }";
 
-        private readonly HalJsonParser _parser = new HalJsonParser();
+        private readonly HalJsonParser _sut = new HalJsonParser();
 
         [Fact]
         public void EmbeddedParsing_ParsesTheCorrectNumberOfRels()
         {
-            var result = _parser.Parse(Json);
+            var result = _sut.Parse(Json);
 
             Assert.Equal(1, result.EmbeddedResources.Select(x => x.Rel).Distinct().Count());
         }
@@ -66,7 +66,7 @@ namespace HalClient.Net.Tests
         [Fact]
         public void EmbeddedParsing_ParsesTheCorrectRels()
         {
-            var result = _parser.Parse(Json);
+            var result = _sut.Parse(Json);
 
             Assert.True(result.EmbeddedResources.All(x => x.Rel == "ea:order"));
         }
@@ -74,7 +74,7 @@ namespace HalClient.Net.Tests
         [Fact]
         public void EmbeddedParsing_ParsesCorrectNumberOfEmbeddedResourceObjects()
         {
-            var result = _parser.Parse(Json);
+            var result = _sut.Parse(Json);
 
             Assert.Equal(2, result.EmbeddedResources.Count());
         }
@@ -82,7 +82,7 @@ namespace HalClient.Net.Tests
         [Fact]
         public void EmbeddedParsing_StateParsing_ParsesCorrectNumberOfStateValues()
         {
-            var result = _parser.Parse(Json);
+            var result = _sut.Parse(Json);
             var order = result.EmbeddedResources.First(x => x.Rel =="ea:order");
 
             Assert.Equal(3, order.State.Count);
@@ -91,7 +91,7 @@ namespace HalClient.Net.Tests
         [Fact]
         public void EmbeddedParsing_StateParsing_ParsesCorrectStateValues()
         {
-            var result = _parser.Parse(Json);
+            var result = _sut.Parse(Json);
             var order = result.EmbeddedResources.First(x => x.Rel == "ea:order");
 
             Assert.Equal((30.00f).ToString(CultureInfo.CurrentCulture), order.State["total"].Value);
@@ -102,7 +102,7 @@ namespace HalClient.Net.Tests
         [Fact]
         public void StateParsing_ParsesCorrectNumberOfStateValues()
         {
-            var result = _parser.Parse(Json);
+            var result = _sut.Parse(Json);
 
             Assert.Equal(2, result.StateValues.Count());
         }
@@ -110,7 +110,7 @@ namespace HalClient.Net.Tests
         [Fact]
         public void StateParsing_ParsesCorrectStateValues()
         {
-            var result = _parser.Parse(Json);
+            var result = _sut.Parse(Json);
 
             Assert.Equal("14", result.StateValues.Single(x => x.Name == "currentlyProcessing").Value);
             Assert.Equal("20", result.StateValues.Single(x => x.Name == "shippedToday").Value);
@@ -119,7 +119,7 @@ namespace HalClient.Net.Tests
         [Fact]
         public void LinkParsing_ParsesCorrectNumberOfRels()
         {
-            var result = _parser.Parse(Json);
+            var result = _sut.Parse(Json);
 
             Assert.Equal(5, result.Links.Select(x => x.Rel).Distinct().Count());
         }
@@ -127,7 +127,7 @@ namespace HalClient.Net.Tests
         [Fact]
         public void LinkParsing_ParsesCorrectNumberOfLinkObjects()
         {
-            var result = _parser.Parse(Json);
+            var result = _sut.Parse(Json);
 
             Assert.Equal(6, result.Links.Count());
         }
@@ -135,7 +135,7 @@ namespace HalClient.Net.Tests
         [Fact]
         public void LinkParsing_ParsesCorrectRels()
         {
-            var result = _parser.Parse(Json);
+            var result = _sut.Parse(Json);
 
             Assert.True(result.Links.Any(x => x.Rel == "self"));
             Assert.True(result.Links.Any(x => x.Rel == "curies"));
@@ -147,7 +147,7 @@ namespace HalClient.Net.Tests
         [Fact]
         public void LinkParsing_ParsesCorrectSelfLink()
         {
-            var result = _parser.Parse(Json);
+            var result = _sut.Parse(Json);
 
             Assert.Equal("/orders", result.Links.Single(x => x.Rel =="self").Href.ToString());
         }
@@ -155,7 +155,7 @@ namespace HalClient.Net.Tests
         [Fact]
         public void LinkParsing_ParsesCorrectAdminTitles()
         {
-            var result = _parser.Parse(Json);
+            var result = _sut.Parse(Json);
 
             Assert.True(result.Links.Where(x => x.Rel == "ea:admin").Any(x => x.Title.Equals("Kate")));
             Assert.True(result.Links.Where(x => x.Rel == "ea:admin").Any(x => x.Title.Equals("Fred")));

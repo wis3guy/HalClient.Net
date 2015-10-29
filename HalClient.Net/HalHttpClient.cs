@@ -19,8 +19,11 @@ namespace HalClient.Net
             if (parser == null)
                 throw new ArgumentNullException("parser");
 
+            if (client == null)
+                throw new ArgumentNullException("client");
+
             _parser = parser;
-            _client = client ?? new HttpClient(new HttpClientHandler { AllowAutoRedirect = false });
+            _client = client;
         }
 
         public Uri BaseAddress

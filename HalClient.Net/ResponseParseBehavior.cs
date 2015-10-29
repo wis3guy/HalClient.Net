@@ -5,7 +5,7 @@ namespace HalClient.Net
 		/// <summary>
 		/// Only parse the response if a success status code is returned
 		/// </summary>
-		Success,
+		SuccessOnly,
 
 		/// <summary>
 		/// Always parse the received response, even if an error status code is returned

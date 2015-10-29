@@ -9,6 +9,6 @@ namespace HalClient.Net
         long MaxResponseContentBufferSize { get; set; }
         TimeSpan Timeout { get; set; }
         HttpRequestHeaders Headers { get; }
-        bool ParseNonSuccessResponse { get; set; }
+        ResponseParseBehavior ParseBehavior { get; set; }
     }
 }

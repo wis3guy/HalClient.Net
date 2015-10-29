@@ -49,7 +49,7 @@ namespace HalClient.Net
             get { return _client.DefaultRequestHeaders; }
         }
 
-        public bool ParseNonSuccessResponse { get; set; }
+        public ResponseParseBehavior ParseBehavior { get; set; }
 
         public async Task<IRootResourceObject> PostAsync<T>(Uri uri, T data)
         {
@@ -94,7 +94,7 @@ namespace HalClient.Net
                 (response.StatusCode == HttpStatusCode.RedirectMethod))
                 return await GetAsync(response.Headers.Location);
 
-            if (!ParseNonSuccessResponse)
+            if (ParseBehavior == ResponseParseBehavior.SuccessOnly)
                 response.EnsureSuccessStatusCode();
 
             IEnumerable<string> contentTypes;

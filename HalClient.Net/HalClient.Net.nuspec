@@ -10,11 +10,11 @@
     <projectUrl>https://github.com/wis3guy/HalClient.Net</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>$description$</description>
-    <copyright>Copyright Geoffrey Braaf 2014</copyright>
+    <copyright>Copyright (C) Geoffrey Braaf, WIS3GUY.NET</copyright>
     <tags>Hypermedia Json HAL</tags>
   </metadata>
   <files>
-    <file src="bin\$configuration$\HalCLient.Net.pdb" target="lib\net45\" />
+    <file src="bin\$configuration$\HalCLient.Net.pdb" target="lib" />
     <file src="ReadMe.txt" target="" />
   </files>
 </package>

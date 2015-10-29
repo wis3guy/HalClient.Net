@@ -6,9 +6,9 @@ using Newtonsoft.Json.Linq;
 
 namespace HalClient.Net.Parser
 {
-    public class HalJsonParser : IHalJsonParser
+	public class HalJsonParser : IHalJsonParser
     {
-        public IRootResourceObject ParseResource(string json)
+        public HalJsonParseResult Parse(string json)
         {
             if (string.IsNullOrEmpty(json))
                 throw new ArgumentNullException("json");
@@ -19,7 +19,7 @@ namespace HalClient.Net.Parser
             return resource;
         }
 
-        private static RootResourceObject ParseRootResourceObject(JObject outer)
+        private static HalJsonParseResult ParseRootResourceObject(JObject outer)
         {
             var links = new List<ILinkObject>();
             var embedded = new List<IEmbeddedResourceObject>();
@@ -27,7 +27,7 @@ namespace HalClient.Net.Parser
 
             ParseResourceObject(outer, links, embedded, state);
 
-            return new RootResourceObject(links, embedded, state);
+            return new HalJsonParseResult(links, embedded, state);
         }
 
         private static EmbeddedResourceObject ParseEmbeddedResourceObject(JObject outer, string rel)

@@ -24,7 +24,7 @@ namespace HalClient.Net
             // Do nothing by default ...
         }
 
-        public IHalHttpClient CreateClient(HttpClient httpClient)
+        public IHalHttpClient CreateClient(HttpClient httpClient = null)
         {
             return CreateHalHttpClient(httpClient);
         }
@@ -73,7 +73,7 @@ namespace HalClient.Net
 
         private HalHttpClient CreateHalHttpClient(HttpClient httpClient = null)
         {
-            var client = new HalHttpClient(_parser, httpClient);
+            var client = new HalHttpClient(_parser, httpClient ?? new HttpClient(new HttpClientHandler { AllowAutoRedirect = false }));
 
             try
             {

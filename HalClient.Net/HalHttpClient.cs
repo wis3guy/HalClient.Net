@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -14,9 +16,14 @@ namespace HalClient.Net
 
         internal HalHttpClient(IHalJsonParser parser, HttpClient client)
         {
-            if (parser == null) throw new ArgumentNullException("parser");
+            if (parser == null)
+                throw new ArgumentNullException("parser");
+
+            if (client == null)
+                throw new ArgumentNullException("client");
+
             _parser = parser;
-            _client = client ?? new HttpClient(new HttpClientHandler { AllowAutoRedirect = false });
+            _client = client;
         }
 
         public Uri BaseAddress
@@ -41,6 +48,8 @@ namespace HalClient.Net
         {
             get { return _client.DefaultRequestHeaders; }
         }
+
+        public ResponseParseBehavior ParseBehavior { get; set; }
 
         public async Task<IRootResourceObject> PostAsync<T>(Uri uri, T data)
         {
@@ -85,14 +94,31 @@ namespace HalClient.Net
                 (response.StatusCode == HttpStatusCode.RedirectMethod))
                 return await GetAsync(response.Headers.Location);
 
-            response.EnsureSuccessStatusCode();
+            if (ParseBehavior == ResponseParseBehavior.SuccessOnly)
+                response.EnsureSuccessStatusCode();
 
-            if (response.StatusCode == HttpStatusCode.NoContent)
-                return new RootResourceObject();
+            IEnumerable<string> contentTypes;
 
-            var json = await response.Content.ReadAsStringAsync();
+            if (response.Headers.TryGetValues("Content-Type", out contentTypes))
+            {
+                if (contentTypes.First().Equals("application/hal+json", StringComparison.OrdinalIgnoreCase))
+                {
+                    if (response.StatusCode == HttpStatusCode.NoContent)
+                        return new RootResourceObject(response.StatusCode);
 
-            return _parser.ParseResource(json);
+                    var json = await response.Content.ReadAsStringAsync();
+                    var result = _parser.Parse(json);
+
+                    return new RootResourceObject(response.StatusCode, result);
+                }
+
+                if (contentTypes != null)
+                    throw new NotSupportedException("The response containes an unsupported 'Content-Type' header value: " + contentTypes.First());
+
+                throw new NotSupportedException("The response is missing the 'Content-Type' header");
+            }
+
+            return null; // unreachable code, needed to satisfy the compiler
         }
 
         private void ResetAcceptHeader()

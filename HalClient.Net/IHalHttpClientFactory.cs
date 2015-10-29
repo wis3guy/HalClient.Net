@@ -4,6 +4,6 @@ namespace HalClient.Net
 {
     public interface IHalHttpClientFactory
     {
-        IHalHttpClient CreateClient(HttpClient httpClient = null);
+        IHalHttpClient CreateClient(HttpClient customHttpClient = null);
     }
 }

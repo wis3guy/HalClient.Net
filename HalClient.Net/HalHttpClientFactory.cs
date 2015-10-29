@@ -23,6 +23,11 @@ namespace HalClient.Net
             // Do nothing by default ...
         }
 
+        protected virtual IHalHttpClient Transform(IHalHttpClient original)
+        {
+            return original; // return original by default ...
+        }
+
         public IHalHttpClient CreateClient(HttpClient customHttpClient = null)
         {
             var httpClient = customHttpClient ?? new HttpClient(new HttpClientHandler {AllowAutoRedirect = false});
@@ -46,7 +51,7 @@ namespace HalClient.Net
                     }
                 }
 
-                return client;
+                return Transform(client);
             }
             catch (Exception)
             {

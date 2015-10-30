@@ -88,6 +88,15 @@ namespace HalClient.Net
             return await ProcessResponseMessage(response);
         }
 
+        public async Task<IRootResourceObject> SendAsync(HttpRequestMessage request)
+        {
+            ResetAcceptHeader();
+
+            var response = await _client.SendAsync(request);
+
+            return await ProcessResponseMessage(response);
+        }
+
         public IRootResourceObject CachedApiRootResource { get; set; }
 
         private async Task<IRootResourceObject> ProcessResponseMessage(HttpResponseMessage response)

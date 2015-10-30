@@ -1,21 +1,13 @@
 ﻿using System;
 using System.Net.Http;
-using System.Threading.Tasks;
 using HalClient.Net.Parser;
 
 namespace HalClient.Net
 {
-    public class HalHttpClientFactory : IHalHttpClientFactory
+    public class HalHttpClientFactory : HalHttpClientFactoryBase, IHalHttpClientFactory
     {
-        private readonly IHalJsonParser _parser;
-        private IRootResourceObject _cachedApiRootResource;
-
-        public HalHttpClientFactory(IHalJsonParser parser)
+        public HalHttpClientFactory(IHalJsonParser parser) : base(parser)
         {
-            if (parser == null)
-                throw new ArgumentNullException("parser");
-
-            _parser = parser;
         }
 
         protected virtual void Configure(IHalHttpClientConfiguration config)
@@ -23,57 +15,74 @@ namespace HalClient.Net
             // Do nothing by default ...
         }
 
-        public IHalHttpClient CreateClient(HttpClient customHttpClient = null)
+        protected virtual IHalHttpClient Transform(IHalHttpClient original)
+        {
+            return original; // return original by default ...
+        }
+
+        public IHalHttpClient CreateClient()
+        {
+            return CreateClient(null);
+        }
+
+        public IHalHttpClient CreateClient(HttpClient customHttpClient)
         {
             var httpClient = customHttpClient ?? new HttpClient(new HttpClientHandler {AllowAutoRedirect = false});
-
-            var client = new HalHttpClient(_parser, httpClient);
+            var halHttpClient = new HalHttpClient(Parser, httpClient);
 
             try
             {
-                Configure(client);
+                Configure(halHttpClient);
+                halHttpClient.CachedApiRootResource = GetApiRootResource(halHttpClient, halHttpClient);
 
-                if (client.ApiRootResourceCachingBehavior != CachingBehavior.Never)
-                {
-                    switch (client.ApiRootResourceCachingBehavior)
-                    {
-                        case CachingBehavior.Once:
-                            client.CachedApiRootResource = GetCachedRootResource(client);
-                            break;
-                        case CachingBehavior.PerClient:
-                            client.CachedApiRootResource = GetFreshRootResource(client);
-                            break;
-                    }
-                }
-
-                return client;
+                return Transform(halHttpClient);
             }
             catch (Exception)
             {
-                client.Dispose(); // client is unusable ...
+                halHttpClient.Dispose(); // client is unusable ...
                 throw;
             }
         }
+    }
 
-        private IRootResourceObject GetCachedRootResource(HalHttpClient client)
+    public class HalHttpClientFactory<T> : HalHttpClientFactoryBase, IHalHttpClientFactory<T>
+    {
+        public HalHttpClientFactory(IHalJsonParser parser) : base(parser)
         {
-            _cachedApiRootResource = _cachedApiRootResource ?? GetFreshRootResource(client);
-
-            return _cachedApiRootResource;
         }
 
-        private static IRootResourceObject GetFreshRootResource(HalHttpClient client)
+        protected virtual void Configure(IHalHttpClientConfiguration config, T context)
         {
-            if (client.BaseAddress == null)
-                throw new InvalidOperationException("The root resource can only be requested for caching if the BaseAddress of the client is initialized in the Configure method of the factory.");
+            // Do nothing by default ...
+        }
 
-            IRootResourceObject resource = null;
+        protected virtual IHalHttpClient Transform(IHalHttpClient original, T context)
+        {
+            return original; // return original by default ...
+        }
 
-            client.GetAsync(client.BaseAddress)
-                .ContinueWith(x => resource = x.Result, TaskContinuationOptions.NotOnFaulted)
-                .Wait();
+        public IHalHttpClient CreateClient(T context)
+        {
+            return CreateClient(null, context);
+        }
 
-            return resource;
+        public IHalHttpClient CreateClient(HttpClient customHttpClient, T context)
+        {
+            var httpClient = customHttpClient ?? new HttpClient(new HttpClientHandler { AllowAutoRedirect = false });
+            var halHttpClient = new HalHttpClient(Parser, httpClient);
+
+            try
+            {
+                Configure(halHttpClient, context);
+                halHttpClient.CachedApiRootResource = GetApiRootResource(halHttpClient, halHttpClient);
+
+                return Transform(halHttpClient, context);
+            }
+            catch (Exception)
+            {
+                halHttpClient.Dispose(); // client is unusable ...
+                throw;
+            }
         }
     }
 }

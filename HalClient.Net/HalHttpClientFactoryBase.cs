@@ -43,8 +43,7 @@ namespace HalClient.Net
         private static IRootResourceObject GetFreshRootResource(IHalHttpClient client, IHalHttpClientConfiguration config)
         {
             if (config.BaseAddress == null)
-                throw new InvalidOperationException(
-                    "The root resource can only be requested for caching if the BaseAddress of the client is initialized in the Configure method of the factory.");
+                throw new InvalidOperationException("The root resource can only be requested for caching if the BaseAddress of the client is initialized in the Configure method of the factory.");
 
             try
             {

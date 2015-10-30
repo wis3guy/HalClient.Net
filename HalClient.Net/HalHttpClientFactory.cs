@@ -33,9 +33,12 @@ namespace HalClient.Net
             try
             {
                 Configure(halHttpClient);
-                halHttpClient.CachedApiRootResource = GetApiRootResource(halHttpClient, halHttpClient);
 
-                return Transform(halHttpClient);
+                var transformed = Transform(halHttpClient);
+
+                halHttpClient.CachedApiRootResource = GetApiRootResource(transformed, halHttpClient);
+
+                return transformed;
             }
             catch (Exception)
             {
@@ -74,9 +77,12 @@ namespace HalClient.Net
             try
             {
                 Configure(halHttpClient, context);
-                halHttpClient.CachedApiRootResource = GetApiRootResource(halHttpClient, halHttpClient);
 
-                return Transform(halHttpClient, context);
+                var transformed = Transform(halHttpClient, context);
+
+                halHttpClient.CachedApiRootResource = GetApiRootResource(transformed, halHttpClient);
+
+                return transformed;
             }
             catch (Exception)
             {

@@ -11,6 +11,7 @@ namespace HalClient.Net
 {
     internal class HalHttpClient : IHalHttpClientConfiguration, IHalHttpClient
     {
+        private const string ApplicationHalJson = "application/hal+json";
         private readonly IHalJsonParser _parser;
         private HttpClient _client;
 
@@ -113,7 +114,7 @@ namespace HalClient.Net
             {
                 var mediaType = response.Content.Headers.ContentType.MediaType;
 
-                if (mediaType.Equals("application/hal+json", StringComparison.OrdinalIgnoreCase))
+                if (mediaType.Equals(ApplicationHalJson, StringComparison.OrdinalIgnoreCase))
                 {
                     if (response.StatusCode == HttpStatusCode.NoContent)
                         return new RootResourceObject(response.StatusCode);
@@ -135,7 +136,7 @@ namespace HalClient.Net
             // FUTURE: Add support for application/hal+xml
 
             _client.DefaultRequestHeaders.Accept.Clear();
-            _client.DefaultRequestHeaders.Add("Accept", "application/hal+json");
+            _client.DefaultRequestHeaders.Add("Accept", ApplicationHalJson);
         }
 
         public void Dispose()

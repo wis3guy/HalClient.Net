@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -9,152 +7,149 @@ using HalClient.Net.Parser;
 
 namespace HalClient.Net
 {
-    internal class HalHttpClient : IHalHttpClientConfiguration, IHalHttpClient
-    {
-        private const string ApplicationHalJson = "application/hal+json";
-        private readonly IHalJsonParser _parser;
-        private HttpClient _client;
+	internal class HalHttpClient : IHalHttpClientConfiguration, IHalHttpClient
+	{
+		private const string ApplicationHalJson = "application/hal+json";
+		private readonly IHalJsonParser _parser;
+		private HttpClient _client;
 
-        internal HalHttpClient(IHalJsonParser parser, HttpClient client)
-        {
-            if (parser == null)
-                throw new ArgumentNullException("parser");
+		internal HalHttpClient(IHalJsonParser parser, HttpClient client)
+		{
+			if (parser == null)
+				throw new ArgumentNullException(nameof(parser));
 
-            if (client == null)
-                throw new ArgumentNullException("client");
+			if (client == null)
+				throw new ArgumentNullException(nameof(client));
 
-            _parser = parser;
-            _client = client;
-        }
+			_parser = parser;
+			_client = client;
+		}
 
-        public Uri BaseAddress
-        {
-            get { return _client.BaseAddress; }
-            set { _client.BaseAddress = value; }
-        }
+		public Uri BaseAddress
+		{
+			get { return _client.BaseAddress; }
+			set { _client.BaseAddress = value; }
+		}
 
-        public long MaxResponseContentBufferSize
-        {
-            get { return _client.MaxResponseContentBufferSize; }
-            set { _client.MaxResponseContentBufferSize = value; }
-        }
+		public long MaxResponseContentBufferSize
+		{
+			get { return _client.MaxResponseContentBufferSize; }
+			set { _client.MaxResponseContentBufferSize = value; }
+		}
 
-        public TimeSpan Timeout
-        {
-            get { return _client.Timeout; }
-            set { _client.Timeout = value; }
-        }
+		public TimeSpan Timeout
+		{
+			get { return _client.Timeout; }
+			set { _client.Timeout = value; }
+		}
 
-        public HttpRequestHeaders Headers
-        {
-            get { return _client.DefaultRequestHeaders; }
-        }
+		public HttpRequestHeaders Headers => _client.DefaultRequestHeaders;
 
-        public ResponseParseBehavior ParseBehavior { get; set; }
-        public CachingBehavior ApiRootResourceCachingBehavior { get; set; }
+		public ResponseParseBehavior ParseBehavior { get; set; }
+		public CachingBehavior ApiRootResourceCachingBehavior { get; set; }
 
-        public async Task<IRootResourceObject> PostAsync<T>(Uri uri, T data)
-        {
-            ResetAcceptHeader();
-            
-            var response = await _client.PostAsJsonAsync(uri, data);
-            
-            return await ProcessResponseMessage(response);
-        }
+		public async Task<IRootResourceObject> PostAsync<T>(Uri uri, T data)
+		{
+			ResetAcceptHeader();
 
-        public async Task<IRootResourceObject> PutAsync<T>(Uri uri, T data)
-        {
-            ResetAcceptHeader();
+			var response = await _client.PostAsJsonAsync(uri, data);
 
-            var response = await _client.PutAsJsonAsync(uri, data);
+			return await ProcessResponseMessage(response);
+		}
 
-            return await ProcessResponseMessage(response);
-        }
+		public async Task<IRootResourceObject> PutAsync<T>(Uri uri, T data)
+		{
+			ResetAcceptHeader();
 
-        public async Task<IRootResourceObject> GetAsync(Uri uri)
-        {
-            ResetAcceptHeader();
+			var response = await _client.PutAsJsonAsync(uri, data);
 
-            var response = await _client.GetAsync(uri);
+			return await ProcessResponseMessage(response);
+		}
 
-            return await ProcessResponseMessage(response);
-        }
+		public async Task<IRootResourceObject> GetAsync(Uri uri)
+		{
+			ResetAcceptHeader();
 
-        public async Task<IRootResourceObject> DeleteAsync(Uri uri)
-        {
-            ResetAcceptHeader();
+			var response = await _client.GetAsync(uri);
 
-            var response = await _client.DeleteAsync(uri);
+			return await ProcessResponseMessage(response);
+		}
 
-            return await ProcessResponseMessage(response);
-        }
+		public async Task<IRootResourceObject> DeleteAsync(Uri uri)
+		{
+			ResetAcceptHeader();
 
-        public async Task<IRootResourceObject> SendAsync(HttpRequestMessage request)
-        {
-            ResetAcceptHeader();
+			var response = await _client.DeleteAsync(uri);
 
-            var response = await _client.SendAsync(request);
+			return await ProcessResponseMessage(response);
+		}
 
-            return await ProcessResponseMessage(response);
-        }
+		public async Task<IRootResourceObject> SendAsync(HttpRequestMessage request)
+		{
+			ResetAcceptHeader();
 
-        public IRootResourceObject CachedApiRootResource { get; set; }
+			var response = await _client.SendAsync(request);
 
-        private async Task<IRootResourceObject> ProcessResponseMessage(HttpResponseMessage response)
-        {
-            if ((response.StatusCode == HttpStatusCode.Redirect) ||
-                (response.StatusCode == HttpStatusCode.SeeOther) ||
-                (response.StatusCode == HttpStatusCode.RedirectMethod))
-                return await GetAsync(response.Headers.Location);
+			return await ProcessResponseMessage(response);
+		}
 
-            if (ParseBehavior == ResponseParseBehavior.SuccessOnly)
-                response.EnsureSuccessStatusCode();
+		public IRootResourceObject CachedApiRootResource { get; set; }
 
-            if (response.Content.Headers.ContentType != null)
-            {
-                var mediaType = response.Content.Headers.ContentType.MediaType;
+		private async Task<IRootResourceObject> ProcessResponseMessage(HttpResponseMessage response)
+		{
+			if ((response.StatusCode == HttpStatusCode.Redirect) ||
+				(response.StatusCode == HttpStatusCode.SeeOther) ||
+				(response.StatusCode == HttpStatusCode.RedirectMethod))
+				return await GetAsync(response.Headers.Location);
 
-                if (mediaType.Equals(ApplicationHalJson, StringComparison.OrdinalIgnoreCase))
-                {
-                    if (response.StatusCode == HttpStatusCode.NoContent)
-                        return new RootResourceObject(response.StatusCode);
+			if (ParseBehavior == ResponseParseBehavior.SuccessOnly)
+				response.EnsureSuccessStatusCode();
 
-                    var json = await response.Content.ReadAsStringAsync();
-                    var result = _parser.Parse(json);
+			if (response.Content.Headers.ContentType != null)
+			{
+				var mediaType = response.Content.Headers.ContentType.MediaType;
 
-                    return new RootResourceObject(response.StatusCode, result);
-                }
+				if (mediaType.Equals(ApplicationHalJson, StringComparison.OrdinalIgnoreCase))
+				{
+					if (response.StatusCode == HttpStatusCode.NoContent)
+						return new RootResourceObject(response.StatusCode);
 
-                throw new NotSupportedException("The response contains an unsupported 'Content-Type' header value: " + mediaType);
-            }
+					var json = await response.Content.ReadAsStringAsync();
+					var result = _parser.Parse(json);
 
-            throw new NotSupportedException("The response is missing the 'Content-Type' header");
-        }
+					return new RootResourceObject(response.StatusCode, result);
+				}
 
-        private void ResetAcceptHeader()
-        {
-            // FUTURE: Add support for application/hal+xml
+				throw new NotSupportedException("The response contains an unsupported 'Content-Type' header value: " + mediaType);
+			}
 
-            _client.DefaultRequestHeaders.Accept.Clear();
-            _client.DefaultRequestHeaders.Add("Accept", ApplicationHalJson);
-        }
+			throw new NotSupportedException("The response is missing the 'Content-Type' header");
+		}
 
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
+		private void ResetAcceptHeader()
+		{
+			// FUTURE: Add support for application/hal+xml
 
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!disposing) 
-                return;
+			_client.DefaultRequestHeaders.Accept.Clear();
+			_client.DefaultRequestHeaders.Add("Accept", ApplicationHalJson);
+		}
 
-            if (_client == null) 
-                return;
+		public void Dispose()
+		{
+			Dispose(true);
+			GC.SuppressFinalize(this);
+		}
 
-            _client.Dispose();
-            _client = null;
-        }
-    }
+		protected virtual void Dispose(bool disposing)
+		{
+			if (!disposing)
+				return;
+
+			if (_client == null)
+				return;
+
+			_client.Dispose();
+			_client = null;
+		}
+	}
 }

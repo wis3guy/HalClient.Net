@@ -12,7 +12,7 @@ namespace HalClient.Net
 		protected HalHttpClientFactoryBase(IHalJsonParser parser)
 		{
 			if (parser == null)
-				throw new ArgumentNullException("parser");
+				throw new ArgumentNullException(nameof(parser));
 
 			Parser = parser;
 		}

@@ -110,10 +110,8 @@ namespace HalClient.Net
 				isHalResponse = mediatype.Equals(ApplicationHalJson, StringComparison.OrdinalIgnoreCase);
 			}
 
-			try
+			if (response.IsSuccessStatusCode)
 			{
-				response.EnsureSuccessStatusCode();
-
 				if (response.StatusCode == HttpStatusCode.NoContent)
 					return new RootResourceObject();
 
@@ -123,22 +121,18 @@ namespace HalClient.Net
 				if (!isHalResponse)
 					throw new NotSupportedException("The response contains an unsupported 'Content-Type' header value: " + mediatype);
 
-				var resource = await ParseContent(response);
-
-				return resource;
+				return await ParseContentAsync(response);
 			}
-			catch (HttpRequestException e)
-			{
-				if (!isHalResponse)
-					throw;
 
-				var resource = await ParseContent(response);
+			if (!isHalResponse)
+				throw new HalHttpRequestException(response.StatusCode, response.ReasonPhrase);
 
-				throw new HalHttpRequestException(e.Message, e, resource);
-			}
+			var resource = await ParseContentAsync(response);
+
+			throw new HalHttpRequestException(response.StatusCode, response.ReasonPhrase, resource);
 		}
 
-		private async Task<RootResourceObject> ParseContent(HttpResponseMessage response)
+		private async Task<IRootResourceObject> ParseContentAsync(HttpResponseMessage response)
 		{
 			var json = await response.Content.ReadAsStringAsync();
 			var result = _parser.Parse(json);
@@ -171,23 +165,5 @@ namespace HalClient.Net
 			_client.Dispose();
 			_client = null;
 		}
-	}
-
-	[Serializable]
-	public class HalHttpRequestException : Exception
-	{
-		public HalHttpRequestException(string message, IRootResourceObject resource = null)
-			: base(message)
-		{
-			Resource = resource;
-		}
-
-		public HalHttpRequestException(string message, Exception inner, IRootResourceObject resource = null)
-			: base(message, inner)
-		{
-			Resource = resource;
-		}
-
-		public IRootResourceObject Resource { get; }
 	}
 }

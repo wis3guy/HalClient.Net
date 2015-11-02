@@ -45,7 +45,6 @@ namespace HalClient.Net
 
 		public HttpRequestHeaders Headers => _client.DefaultRequestHeaders;
 
-		public ResponseParseBehavior ParseBehavior { get; set; }
 		public CachingBehavior ApiRootResourceCachingBehavior { get; set; }
 
 		public async Task<IRootResourceObject> PostAsync<T>(Uri uri, T data)

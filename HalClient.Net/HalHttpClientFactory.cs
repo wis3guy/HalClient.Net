@@ -1,13 +1,22 @@
 ﻿using System;
 using System.Net.Http;
+using System.Threading.Tasks;
 using HalClient.Net.Parser;
 
 namespace HalClient.Net
 {
-	public class HalHttpClientFactory : HalHttpClientFactoryBase, IHalHttpClientFactory
+	public class HalHttpClientFactory : IHalHttpClientFactory
 	{
-		public HalHttpClientFactory(IHalJsonParser parser) : base(parser)
+		private IRootResourceObject _cachedApiRootResource;
+
+		protected readonly IHalJsonParser Parser;
+
+		public HalHttpClientFactory(IHalJsonParser parser)
 		{
+			if (parser == null)
+				throw new ArgumentNullException(nameof(parser));
+
+			Parser = parser;
 		}
 
 		protected virtual void Configure(IHalHttpClientConfiguration config)
@@ -20,14 +29,63 @@ namespace HalClient.Net
 			return original; // return original by default ...
 		}
 
-		public IHalHttpClient CreateClient()
+		protected virtual HttpClient GetHttpClient()
 		{
-			return CreateClient(null);
+			return new HttpClient(new HttpClientHandler { AllowAutoRedirect = false });
 		}
 
-		public IHalHttpClient CreateClient(HttpClient customHttpClient)
+		protected virtual HttpClient GetHttpClient(HttpMessageHandler httpMessageHandler)
 		{
-			var httpClient = customHttpClient ?? new HttpClient(new HttpClientHandler {AllowAutoRedirect = false});
+			return new HttpClient(httpMessageHandler);
+		}
+
+		protected IRootResourceObject GetApiRootResource(IHalHttpClient client, IHalHttpClientConfiguration config)
+		{
+			if (config.ApiRootResourceCachingBehavior != CachingBehavior.Never)
+			{
+				switch (config.ApiRootResourceCachingBehavior)
+				{
+					case CachingBehavior.Once:
+						return GetCachedRootResource(client, config);
+					case CachingBehavior.PerClient:
+						return GetFreshRootResource(client, config);
+				}
+			}
+
+			return null;
+		}
+
+		private IRootResourceObject GetCachedRootResource(IHalHttpClient client, IHalHttpClientConfiguration config)
+		{
+			_cachedApiRootResource = _cachedApiRootResource ?? GetFreshRootResource(client, config);
+
+			return _cachedApiRootResource;
+		}
+
+		private static IRootResourceObject GetFreshRootResource(IHalHttpClient client, IHalHttpClientConfiguration config)
+		{
+			if (config.BaseAddress == null)
+				throw new InvalidOperationException("The root resource can only be requested for caching if the BaseAddress of the client is initialized in the Configure method of the factory.");
+
+			IRootResourceObject resource = null;
+
+			client.GetAsync(config.BaseAddress)
+				.ContinueWith(x => resource = x.Result, TaskContinuationOptions.NotOnFaulted)
+				.Wait();
+
+			return resource;
+		}
+
+		public IHalHttpClient CreateClient()
+		{
+			return CreateClient(GetHttpClient());
+		}
+
+		public IHalHttpClient CreateClient(HttpClient httpClient)
+		{
+			if (httpClient == null)
+				throw new ArgumentNullException(nameof(httpClient));
+
 			var halHttpClient = new HalHttpClient(Parser, httpClient);
 
 			try
@@ -46,9 +104,17 @@ namespace HalClient.Net
 				throw;
 			}
 		}
+
+		public IHalHttpClient CreateClient(HttpMessageHandler httpMessageHandler)
+		{
+			if (httpMessageHandler == null)
+				throw new ArgumentNullException(nameof(httpMessageHandler));
+
+			return CreateClient(GetHttpClient(httpMessageHandler));
+		}
 	}
 
-	public class HalHttpClientFactory<T> : HalHttpClientFactoryBase, IHalHttpClientFactory<T>
+	public class HalHttpClientFactory<T> : HalHttpClientFactory, IHalHttpClientFactory<T>
 	{
 		public HalHttpClientFactory(IHalJsonParser parser) : base(parser)
 		{
@@ -66,12 +132,14 @@ namespace HalClient.Net
 
 		public IHalHttpClient CreateClient(T context)
 		{
-			return CreateClient(null, context);
+			return CreateClient(new HttpClient(new HttpClientHandler { AllowAutoRedirect = false }), context);
 		}
 
-		public IHalHttpClient CreateClient(HttpClient customHttpClient, T context)
+		public IHalHttpClient CreateClient(HttpClient httpClient, T context)
 		{
-			var httpClient = customHttpClient ?? new HttpClient(new HttpClientHandler {AllowAutoRedirect = false});
+			if (httpClient == null)
+				throw new ArgumentNullException(nameof(httpClient));
+
 			var halHttpClient = new HalHttpClient(Parser, httpClient);
 
 			try
@@ -89,6 +157,14 @@ namespace HalClient.Net
 				halHttpClient.Dispose(); // client is unusable ...
 				throw;
 			}
+		}
+
+		public IHalHttpClient CreateClient(HttpMessageHandler httpMessageHandler, T context)
+		{
+			if (httpMessageHandler == null)
+				throw new ArgumentNullException(nameof(httpMessageHandler));
+
+			return CreateClient(new HttpClient(httpMessageHandler), context);
 		}
 	}
 }

@@ -1,20 +1,17 @@
 ﻿using System;
-using System.Net;
 using Tavis.UriTemplates;
 
 namespace HalClient.Net.Parser
 {
 	internal class RootResourceObject : ResourceObjectBase, IRootResourceObject
 	{
-		public RootResourceObject(HttpStatusCode statusCode)
+		public RootResourceObject()
 		{
-			StatusCode = statusCode;
 		}
 
-		public RootResourceObject(HttpStatusCode statusCode, HalJsonParseResult result)
+		public RootResourceObject(HalJsonParseResult result)
 			: base(result.StateValues, result.EmbeddedResources, result.Links)
 		{
-			StatusCode = statusCode;
 		}
 
 		public Uri GetDocumentationUri(IHaveLinkRelation subject)
@@ -39,8 +36,6 @@ namespace HalClient.Net.Parser
 
 			return null;
 		}
-
-		public HttpStatusCode StatusCode { get; }
 
 		private static Uri ResolveDocumentationUri(ILinkObject link, string rel)
 		{

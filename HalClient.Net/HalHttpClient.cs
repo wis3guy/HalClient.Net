@@ -102,28 +102,49 @@ namespace HalClient.Net
 				(response.StatusCode == HttpStatusCode.RedirectMethod))
 				return await GetAsync(response.Headers.Location);
 
-			if (ParseBehavior == ResponseParseBehavior.SuccessOnly)
-				response.EnsureSuccessStatusCode();
+			string mediatype = null;
+			var isHalResponse = false;
 
 			if (response.Content.Headers.ContentType != null)
 			{
-				var mediaType = response.Content.Headers.ContentType.MediaType;
-
-				if (mediaType.Equals(ApplicationHalJson, StringComparison.OrdinalIgnoreCase))
-				{
-					if (response.StatusCode == HttpStatusCode.NoContent)
-						return new RootResourceObject(response.StatusCode);
-
-					var json = await response.Content.ReadAsStringAsync();
-					var result = _parser.Parse(json);
-
-					return new RootResourceObject(response.StatusCode, result);
-				}
-
-				throw new NotSupportedException("The response contains an unsupported 'Content-Type' header value: " + mediaType);
+				mediatype = response.Content.Headers.ContentType.MediaType;
+				isHalResponse = mediatype.Equals(ApplicationHalJson, StringComparison.OrdinalIgnoreCase);
 			}
 
-			throw new NotSupportedException("The response is missing the 'Content-Type' header");
+			try
+			{
+				response.EnsureSuccessStatusCode();
+
+				if (response.StatusCode == HttpStatusCode.NoContent)
+					return new RootResourceObject();
+
+				if (string.IsNullOrEmpty(mediatype))
+					throw new NotSupportedException("The response is missing the 'Content-Type' header");
+
+				if (!isHalResponse)
+					throw new NotSupportedException("The response contains an unsupported 'Content-Type' header value: " + mediatype);
+
+				var resource = await ParseContent(response);
+
+				return resource;
+			}
+			catch (HttpRequestException e)
+			{
+				if (!isHalResponse)
+					throw;
+
+				var resource = await ParseContent(response);
+
+				throw new HalHttpRequestException(e.Message, e, resource);
+			}
+		}
+
+		private async Task<RootResourceObject> ParseContent(HttpResponseMessage response)
+		{
+			var json = await response.Content.ReadAsStringAsync();
+			var result = _parser.Parse(json);
+
+			return new RootResourceObject(result);
 		}
 
 		private void ResetAcceptHeader()
@@ -151,5 +172,23 @@ namespace HalClient.Net
 			_client.Dispose();
 			_client = null;
 		}
+	}
+
+	[Serializable]
+	public class HalHttpRequestException : Exception
+	{
+		public HalHttpRequestException(string message, IRootResourceObject resource = null)
+			: base(message)
+		{
+			Resource = resource;
+		}
+
+		public HalHttpRequestException(string message, Exception inner, IRootResourceObject resource = null)
+			: base(message, inner)
+		{
+			Resource = resource;
+		}
+
+		public IRootResourceObject Resource { get; }
 	}
 }

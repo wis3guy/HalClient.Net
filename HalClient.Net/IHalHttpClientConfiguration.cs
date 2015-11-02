@@ -9,7 +9,6 @@ namespace HalClient.Net
 		long MaxResponseContentBufferSize { get; set; }
 		TimeSpan Timeout { get; set; }
 		HttpRequestHeaders Headers { get; }
-		ResponseParseBehavior ParseBehavior { get; set; }
 		CachingBehavior ApiRootResourceCachingBehavior { get; set; }
 	}
 }

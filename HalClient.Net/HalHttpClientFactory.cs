@@ -67,13 +67,11 @@ namespace HalClient.Net
 			if (config.BaseAddress == null)
 				throw new InvalidOperationException("The root resource can only be requested for caching if the BaseAddress of the client is initialized in the Configure method of the factory.");
 
-			IRootResourceObject resource = null;
+			var task = client.GetAsync(config.BaseAddress);
+			task.ConfigureAwait(false);
+			task.Wait();
 
-			client.GetAsync(config.BaseAddress)
-				.ContinueWith(x => resource = x.Result, TaskContinuationOptions.NotOnFaulted)
-				.Wait();
-
-			return resource;
+			return task.Result;
 		}
 
 		public IHalHttpClient CreateClient()
@@ -132,7 +130,7 @@ namespace HalClient.Net
 
 		public IHalHttpClient CreateClient(T context)
 		{
-			return CreateClient(new HttpClient(new HttpClientHandler { AllowAutoRedirect = false }), context);
+			return CreateClient(GetHttpClient(), context);
 		}
 
 		public IHalHttpClient CreateClient(HttpClient httpClient, T context)
@@ -164,7 +162,7 @@ namespace HalClient.Net
 			if (httpMessageHandler == null)
 				throw new ArgumentNullException(nameof(httpMessageHandler));
 
-			return CreateClient(new HttpClient(httpMessageHandler), context);
+			return CreateClient(GetHttpClient(httpMessageHandler), context);
 		}
 	}
 }

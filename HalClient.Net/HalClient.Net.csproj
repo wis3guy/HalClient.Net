@@ -56,6 +56,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CachingBehavior.cs" />
+    <Compile Include="HalHttpRequestException.cs" />
     <Compile Include="Parser\EmbeddedResourceObject.cs" />
     <Compile Include="Parser\HalJsonParseResult.cs" />
     <Compile Include="Parser\IEmbeddedResourceObject.cs" />
@@ -76,7 +77,6 @@
     <Compile Include="Parser\RootResourceObject.cs" />
     <Compile Include="Parser\StateValue.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ResponseParseBehavior.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

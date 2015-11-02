@@ -1,30 +1,35 @@
 ﻿using System.Net.Http;
 using HalClient.Net.Parser;
+using Moq;
 using Xunit;
 
 namespace HalClient.Net.Tests
 {
-    public class HalHttpClientFactoryTests
-    {
-        readonly IHalHttpClientFactory _target = new HalHttpClientFactory(new HalJsonParser());
+	public class HalHttpClientFactoryTests
+	{
+		private readonly IHalJsonParser _mockedHalJsonParser = new Mock<IHalJsonParser>().Object;
 
-        [Fact]
-        public void CreateClient_CreatesAClient()
-        {
-            using (var client = _target.CreateClient())
-            {
-                Assert.NotNull(client);
-            }
-        }
+		[Fact]
+		public void CreateClient_CreatesAClient()
+		{
+			var sut = new HalHttpClientFactory(_mockedHalJsonParser);
 
-        [Fact]
-        public void CreateClient_WithHttpClient()
-        {
-            using (var httpClient = new HttpClient())
-            using (var client = _target.CreateClient(httpClient))
-            {
-                Assert.NotNull(client);
-            }
-        }
-    }
+			using (var client = sut.CreateClient())
+			{
+				Assert.NotNull(client);
+			}
+		}
+
+		[Fact]
+		public void CreateClient_WithHttpClient()
+		{
+			var sut = new HalHttpClientFactory(_mockedHalJsonParser);
+
+			using (var httpClient = new HttpClient())
+			using (var client = sut.CreateClient(httpClient))
+			{
+				Assert.NotNull(client);
+			}
+		}
+	}
 }

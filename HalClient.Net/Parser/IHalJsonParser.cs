@@ -1,7 +1,7 @@
 namespace HalClient.Net.Parser
 {
-    public interface IHalJsonParser
-    {
+	public interface IHalJsonParser
+	{
 		HalJsonParseResult Parse(string json);
-    }
+	}
 }

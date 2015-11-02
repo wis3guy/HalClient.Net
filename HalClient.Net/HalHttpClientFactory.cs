@@ -1,90 +1,94 @@
 ﻿using System;
-using System.Linq;
 using System.Net.Http;
-using System.Threading.Tasks;
 using HalClient.Net.Parser;
 
 namespace HalClient.Net
 {
-    public class HalHttpClientFactory : IHalHttpClientFactory, IHalHttpClientWithRootFactory
-    {
-        private readonly IHalJsonParser _parser;
-        private IRootResourceObject _root;
+	public class HalHttpClientFactory : HalHttpClientFactoryBase, IHalHttpClientFactory
+	{
+		public HalHttpClientFactory(IHalJsonParser parser) : base(parser)
+		{
+		}
 
-        public HalHttpClientFactory(IHalJsonParser parser)
-        {
-            if (parser == null) 
-                throw new ArgumentNullException("parser");
-            
-            _parser = parser;
-        }
+		protected virtual void Configure(IHalHttpClientConfiguration config)
+		{
+			// Do nothing by default ...
+		}
 
-        protected virtual void Configure(IHalHttpClientConfiguration client)
-        {
-            // Do nothing by default ...
-        }
+		protected virtual IHalHttpClient Transform(IHalHttpClient original)
+		{
+			return original; // return original by default ...
+		}
 
-        public IHalHttpClient CreateClient(HttpClient httpClient = null)
-        {
-            return CreateHalHttpClient(httpClient);
-        }
+		public IHalHttpClient CreateClient()
+		{
+			return CreateClient(null);
+		}
 
-        public IHalHttpClientWithRoot CreateClientWithRoot(bool refresh = false)
-        {
-            var client = CreateHalHttpClient();
+		public IHalHttpClient CreateClient(HttpClient customHttpClient)
+		{
+			var httpClient = customHttpClient ?? new HttpClient(new HttpClientHandler {AllowAutoRedirect = false});
+			var halHttpClient = new HalHttpClient(Parser, httpClient);
 
-            if (client.BaseAddress == null)
-                throw new InvalidOperationException("Base address unknown. Consider creating an custom HalHttpClientFactory, and override the Configure() method. Alternatively, call this method's overload which takes the base address as a parameter.");
-            
-            SetRoot(client, client.BaseAddress, refresh);
+			try
+			{
+				Configure(halHttpClient);
 
-            return client;
-        }
+				var transformed = Transform(halHttpClient);
 
-        public IHalHttpClientWithRoot CreateClientWithRoot(Uri baseAddress, bool refresh = false)
-        {
-            if (baseAddress == null)
-                throw new ArgumentNullException("baseAddress");
-            
-            var client = CreateHalHttpClient();
+				halHttpClient.CachedApiRootResource = GetApiRootResource(transformed, halHttpClient);
 
-            SetRoot(client, baseAddress, refresh);
+				return transformed;
+			}
+			catch (Exception)
+			{
+				halHttpClient.Dispose(); // client is unusable ...
+				throw;
+			}
+		}
+	}
 
-            return client;
-        }
+	public class HalHttpClientFactory<T> : HalHttpClientFactoryBase, IHalHttpClientFactory<T>
+	{
+		public HalHttpClientFactory(IHalJsonParser parser) : base(parser)
+		{
+		}
 
-        private void SetRoot(HalHttpClient client, Uri baseAddress, bool refresh)
-        {
-            try
-            {
-                if (refresh || (_root == null))
-                    client.GetAsync(baseAddress)
-                        .ContinueWith(x => _root = x.Result, TaskContinuationOptions.NotOnFaulted)
-                        .Wait();
+		protected virtual void Configure(IHalHttpClientConfiguration config, T context)
+		{
+			// Do nothing by default ...
+		}
 
-                client.Root = _root;
-            }
-            catch (AggregateException ex)
-            {
-                client.Dispose(); // client is unusable ...
-                throw new Exception("Could not GET the root response from '" + baseAddress + "'.", ex.InnerExceptions.FirstOrDefault());
-            }
-        }
+		protected virtual IHalHttpClient Transform(IHalHttpClient original, T context)
+		{
+			return original; // return original by default ...
+		}
 
-        private HalHttpClient CreateHalHttpClient(HttpClient httpClient = null)
-        {
-            var client = new HalHttpClient(_parser, httpClient ?? new HttpClient(new HttpClientHandler { AllowAutoRedirect = false }));
+		public IHalHttpClient CreateClient(T context)
+		{
+			return CreateClient(null, context);
+		}
 
-            try
-            {
-                Configure(client);
-                return client;
-            }
-            catch (Exception)
-            {
-                client.Dispose(); // client is unusable ...
-                throw;
-            }
-        }
-    }
+		public IHalHttpClient CreateClient(HttpClient customHttpClient, T context)
+		{
+			var httpClient = customHttpClient ?? new HttpClient(new HttpClientHandler {AllowAutoRedirect = false});
+			var halHttpClient = new HalHttpClient(Parser, httpClient);
+
+			try
+			{
+				Configure(halHttpClient, context);
+
+				var transformed = Transform(halHttpClient, context);
+
+				halHttpClient.CachedApiRootResource = GetApiRootResource(transformed, halHttpClient);
+
+				return transformed;
+			}
+			catch (Exception)
+			{
+				halHttpClient.Dispose(); // client is unusable ...
+				throw;
+			}
+		}
+	}
 }

@@ -5,16 +5,17 @@ namespace HalClient.Net.Parser
 {
 	public class HalJsonParseResult
 	{
-		public HalJsonParseResult(IEnumerable<ILinkObject> links, IEnumerable<IEmbeddedResourceObject> embeddedResources, IEnumerable<IStateValue> stateValues)
+		public HalJsonParseResult(IEnumerable<ILinkObject> links, IEnumerable<IEmbeddedResourceObject> embeddedResources,
+			IEnumerable<IStateValue> stateValues)
 		{
 			if (links == null)
-				throw new ArgumentNullException("links");
+				throw new ArgumentNullException(nameof(links));
 
 			if (embeddedResources == null)
-				throw new ArgumentNullException("embeddedResources");
+				throw new ArgumentNullException(nameof(embeddedResources));
 
 			if (stateValues == null)
-				throw new ArgumentNullException("stateValues");
+				throw new ArgumentNullException(nameof(stateValues));
 
 			Links = links;
 			EmbeddedResources = embeddedResources;

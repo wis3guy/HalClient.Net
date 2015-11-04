@@ -112,9 +112,9 @@ namespace HalClient.Net
 		}
 	}
 
-	public class HalHttpClientFactory<T> : HalHttpClientFactory, IHalHttpClientFactory<T>
+	public abstract class HalHttpClientFactory<T> : HalHttpClientFactory, IHalHttpClientFactory<T>
 	{
-		public HalHttpClientFactory(IHalJsonParser parser) : base(parser)
+		protected HalHttpClientFactory(IHalJsonParser parser) : base(parser)
 		{
 		}
 

@@ -1,20 +1,20 @@
 <?xml version="1.0"?>
 <package >
   <metadata>
-    <id>$id$</id>
-    <version>$version$</version>
-    <title>$title$</title>
-    <authors>$author$</authors>
-    <owners>$author$</owners>
-    <licenseUrl>https://github.com/wis3guy/HalClient.Net/blob/master/Licence.md</licenseUrl>
-    <projectUrl>https://github.com/wis3guy/HalClient.Net</projectUrl>
-    <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>$description$</description>
-    <copyright>Copyright (C) Geoffrey Braaf, WIS3GUY.NET</copyright>
-    <tags>Hypermedia Json HAL</tags>
+	<id>$id$</id>
+	<version>$version$</version>
+	<title>$title$</title>
+	<authors>$author$</authors>
+	<owners>$author$</owners>
+	<licenseUrl>https://github.com/wis3guy/HalClient.Net/blob/master/Licence.md</licenseUrl>
+	<projectUrl>https://github.com/wis3guy/HalClient.Net</projectUrl>
+	<requireLicenseAcceptance>false</requireLicenseAcceptance>
+	<description>$description$</description>
+	<copyright>Copyright (C) Geoffrey Braaf, WIS3GUY.NET</copyright>
+	<tags>Hypermedia Json HAL</tags>
   </metadata>
   <files>
-    <file src="bin\$configuration$\HalCLient.Net.pdb" target="lib" />
-    <file src="ReadMe.txt" target="" />
+	<file src="bin\$configuration$\HalCLient.Net.pdb" target="lib" />
+	<file src="tools\*.*" target="tools" />
   </files>
 </package>

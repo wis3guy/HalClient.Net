@@ -24,7 +24,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Nuget Package", "Nuget Pack
 	ProjectSection(SolutionItems) = preProject
 		Build.cmd = Build.cmd
 		HalClient.Net\HalClient.Net.nuspec = HalClient.Net\HalClient.Net.nuspec
-		tools\install.ps1 = tools\install.ps1
+		HalClient.Net\tools\install.ps1 = HalClient.Net\tools\install.ps1
 	EndProjectSection
 EndProject
 Global

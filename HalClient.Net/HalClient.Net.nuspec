@@ -8,6 +8,7 @@
 	<owners>$author$</owners>
 	<licenseUrl>https://github.com/wis3guy/HalClient.Net/blob/master/Licence.md</licenseUrl>
 	<projectUrl>https://github.com/wis3guy/HalClient.Net</projectUrl>
+	<iconUrl>https://github.com/wis3guy/HalClient.Net/blob/master/logo.png?raw=true</iconUrl>
 	<requireLicenseAcceptance>false</requireLicenseAcceptance>
 	<description>$description$</description>
 	<copyright>Copyright (C) Geoffrey Braaf, WIS3GUY.NET</copyright>

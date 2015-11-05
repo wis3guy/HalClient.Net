@@ -20,6 +20,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Markdown", "Markdown", "{A0
 		ReadMe.md = ReadMe.md
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Nuget Package", "Nuget Package", "{3E2617A6-85EB-48C6-820D-EC3758A5CC8E}"
+	ProjectSection(SolutionItems) = preProject
+		Build.cmd = Build.cmd
+		HalClient.Net\HalClient.Net.nuspec = HalClient.Net\HalClient.Net.nuspec
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

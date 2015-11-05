@@ -24,7 +24,7 @@ namespace HalClient.Net
 			// Do nothing by default ...
 		}
 
-		protected virtual IHalHttpClient Transform(IHalHttpClient original)
+		protected virtual IHalHttpClient Decorate(IHalHttpClient original)
 		{
 			return original; // return original by default ...
 		}
@@ -90,7 +90,7 @@ namespace HalClient.Net
 			{
 				Configure(halHttpClient);
 
-				var transformed = Transform(halHttpClient);
+				var transformed = Decorate(halHttpClient);
 
 				halHttpClient.CachedApiRootResource = GetApiRootResource(transformed, halHttpClient);
 
@@ -123,7 +123,7 @@ namespace HalClient.Net
 			// Do nothing by default ...
 		}
 
-		protected virtual IHalHttpClient Transform(IHalHttpClient original, T context)
+		protected virtual IHalHttpClient Decorate(IHalHttpClient original, T context)
 		{
 			return original; // return original by default ...
 		}
@@ -144,7 +144,7 @@ namespace HalClient.Net
 			{
 				Configure(halHttpClient, context);
 
-				var transformed = Transform(halHttpClient, context);
+				var transformed = Decorate(halHttpClient, context);
 
 				halHttpClient.CachedApiRootResource = GetApiRootResource(transformed, halHttpClient);
 

@@ -30,16 +30,16 @@ Within your code, you can now use the factory to create your clients as follows:
 ```c#
 using (var client = factory.CreateClient())
 {
-    var resource = await client.GetAsync(new Uri("http://example.com/orders"));
+	var resource = await client.GetAsync(new Uri("http://example.com/orders"));
 
-    // get the self link of the root resource
-    var selfUri = resource.Links["self"].First().Href;
-    
-    // get the order dates of all embedded order resources
-    var orderDates = resource.Embedded["example:order"].Select(x => x.State["Date"].Value);
-    
-    // automatically resolve the documentation uri for a named link relation based on curies
-    var documentationUri = resource.GetDocumentationUri(resource.Links["address:invoice"].First());
+	// get the self link of the root resource
+	var selfUri = resource.Links["self"].First().Href;
+	
+	// get the order dates of all embedded order resources
+	var orderDates = resource.Embedded["example:order"].Select(x => x.State["Date"].Value);
+	
+	// automatically resolve the documentation uri for a named link relation based on curies
+	var documentationUri = resource.GetDocumentationUri(resource.Links["address:invoice"].First());
 }
 ```
 
@@ -54,21 +54,21 @@ If you want to configure all instantiated `IHalHttpClient` objects consistently,
 ```c#
 public class CustomApiCLientFactory : HalHttpClientFactory
 {
-    private readonly string _apiKey;
+	private readonly string _apiKey;
 
-    public CustomApiCLientFactory(IHalJsonParser parser, string apiKey) : base(parser)
-    {
-        _apiKey = apiKey;
-    }
+	public CustomApiCLientFactory(IHalJsonParser parser, string apiKey) : base(parser)
+	{
+		_apiKey = apiKey;
+	}
 
-    protected override void Configure(IHalHttpClientConfiguration config)
-    {
-        config.BaseAddress = new Uri("http://example.com");
-        config.Headers.Add("Authorization",string.Format("API_KEY_SCHEME apikey=\"{0}\"", _apiKey));
-        config.MaxResponseContentBufferSize = 1024;
-        config.Timeout = TimeSpan.FromSeconds(10);
-        config.ApiRootResourceCachingBehavior = CachingBehavior.Once;
-    }
+	protected override void Configure(IHalHttpClientConfiguration config)
+	{
+		config.BaseAddress = new Uri("http://example.com");
+		config.Headers.Add("Authorization",string.Format("API_KEY_SCHEME apikey=\"{0}\"", _apiKey));
+		config.MaxResponseContentBufferSize = 1024;
+		config.Timeout = TimeSpan.FromSeconds(10);
+		config.ApiRootResourceCachingBehavior = CachingBehavior.Once;
+	}
 }
 ```
 The following options can be configured:
@@ -176,15 +176,15 @@ public class CustomHalHttpClientFactory : HalHttpClientFactory
 	{
 	}
 
-	protected override IHalHttpClient Transform(IHalHttpClient original)
+	protected override IHalHttpClient Decorate(IHalHttpClient original)
 	{
 		return new CustomHalHttpClient(original);
 	}
 }
 ```
 
-###I want to pass an adhoc context object to my `Configure` and/or `Transform` overrides
-There are scenarios where you might need to pass a context object from the code calling `HalHttpClientFactory.Create()` to the custom `Configure` and/or `Transform` overrides of you custom factory. This is typically useful when dealing with remote use impersonation, where your client makes API requests on behalf of a remote user.
+###I want to pass an adhoc context object to my `Configure` and/or `Decorate` overrides
+There are scenarios where you might need to pass a context object from the code calling `HalHttpClientFactory.Create()` to the custom `Configure` and/or `Decorate` overrides of you custom factory. This is typically useful when dealing with remote use impersonation, where your client makes API requests on behalf of a remote user.
 
 To help you deal with such situations, there is an abstract generic `HalHttpClientFactory<T>` class from which you can derive your custom factory.
 
@@ -211,17 +211,17 @@ public class CustomHalHttpClientFactory : HalHttpClientFactory<string>
 		//
 	}
 
-	protected override IHalHttpClient Transform(IHalHttpClient original)
+	protected override IHalHttpClient Decorate(IHalHttpClient original)
 	{
 		//
-		// Custom Transform, in case a context was *not* specified in the Create() call
+		// Custom Decorate, in case a context was *not* specified in the Create() call
 		//
 	}
 
-	protected override IHalHttpClient Transform(IHalHttpClient original, string context)
+	protected override IHalHttpClient Decorate(IHalHttpClient original, string context)
 	{
 		//
-		// Custom Transform, in case a context was specified in the Create() call
+		// Custom Decorate, in case a context was specified in the Create() call
 		//
 	}
 }
@@ -239,7 +239,7 @@ var custom = new HttpClient();
 
 using (var client = factory.CreateClient(custom))
 {
-    //
+	//
 	// Do something with the client ...
 	//
 }
@@ -304,7 +304,7 @@ custom(new Uri("http://example.org/test"), new HttpResponseMessage(HttpStatusCod
 
 using (var client = factory.CreateClient(custom))
 {
-    //
+	//
 	// Do something with the client ...
 	//
 }

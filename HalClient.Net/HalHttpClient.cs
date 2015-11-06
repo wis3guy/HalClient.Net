@@ -27,10 +27,10 @@ namespace HalClient.Net
 			_httpClient = httpClient;
 
 			HttpClient = new NonParsingHttpClient(httpClient);
-			Config = new HalHttpClientConfiguration(httpClient);
+			Configuration = new HalHttpClientConfiguration(httpClient);
 		}
 
-		public IHalHttpClientConfiguration Config { get; }
+		public IHalHttpClientConfiguration Configuration { get; }
 		
 		public async Task<IRootResourceObject> PostAsync<T>(Uri uri, T data)
 		{
@@ -88,18 +88,18 @@ namespace HalClient.Net
 
 		private void RestoreAcceptHeaders(IEnumerable<MediaTypeWithQualityHeaderValue> backup)
 		{
-			Config.Headers.Accept.Clear();
+			Configuration.Headers.Accept.Clear();
 
 			foreach (var headerValue in backup)
-				Config.Headers.Accept.Add(headerValue);
+				Configuration.Headers.Accept.Add(headerValue);
 		}
 
 		private MediaTypeWithQualityHeaderValue[] OverrideAcceptHeaders()
 		{
-			var backup = Config.Headers.Accept.ToArray();
+			var backup = Configuration.Headers.Accept.ToArray();
 
-			Config.Headers.Accept.Clear();
-			Config.Headers.Add("Accept", ApplicationHalJson);
+			Configuration.Headers.Accept.Clear();
+			Configuration.Headers.Add("Accept", ApplicationHalJson);
 
 			return backup;
 		}

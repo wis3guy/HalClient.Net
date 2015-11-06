@@ -56,6 +56,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CachingBehavior.cs" />
+    <Compile Include="HalHttpClientFactory.cs" />
     <Compile Include="HalHttpClientConfiguration.cs" />
     <Compile Include="HalHttpRequestException.cs" />
     <Compile Include="INonParsingHttpClient.cs" />
@@ -69,7 +70,7 @@
     <Compile Include="Parser\IStateValue.cs" />
     <Compile Include="Parser\LinkObject.cs" />
     <Compile Include="Parser\ResourceObjectBase.cs" />
-    <Compile Include="HalHttpClientFactory.cs" />
+    <Compile Include="HalHttpClientFactoryBase.cs" />
     <Compile Include="IHalHttpClientConfiguration.cs" />
     <Compile Include="IHalHttpClient.cs" />
     <Compile Include="IHalHttpClientFactory.cs" />

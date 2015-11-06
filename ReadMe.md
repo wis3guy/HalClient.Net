@@ -59,7 +59,7 @@ Value | Description
 `PerClient` | The API's root resource will be automatically retrieved and cached every time a `IHalHttpClient` instance is created and will remain cached as long as the client is not disposed.
 `Once` | The API's root resource will be automatically retrieved and cached when the first `IHalHttpClient` instance is created and will remain cached as long as the `HalHttpClientFactory` is not garbage collected.
 
-In order to make use of the built-in caching mechanism, use one of the awaitable `CreateClientAsync(CachingBehavior)` overloads.
+In order to make use of the built-in caching mechanism, use one of the awaitable `CreateClientAsync()` overloads.
 
 ```c#
 using (var client = await factory.CreateClientAsync(CachingBehavior.PerClient))

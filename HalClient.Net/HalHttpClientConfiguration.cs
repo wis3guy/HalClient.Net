@@ -32,7 +32,5 @@ namespace HalClient.Net
 		}
 
 		public HttpRequestHeaders Headers => _httpClient.DefaultRequestHeaders;
-
-		public CachingBehavior ApiRootResourceCachingBehavior { get; set; }
 	}
 }

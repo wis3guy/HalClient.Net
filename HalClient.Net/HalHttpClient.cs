@@ -1,98 +1,75 @@
 using System;
 using System.Net;
 using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using HalClient.Net.Parser;
 
 namespace HalClient.Net
 {
-	internal class HalHttpClient : IHalHttpClientConfiguration, IHalHttpClient
+	internal class HalHttpClient : IHalHttpClient
 	{
 		private const string ApplicationHalJson = "application/hal+json";
 		private readonly IHalJsonParser _parser;
-		private HttpClient _client;
+		private HttpClient _httpClient;
 
-		internal HalHttpClient(IHalJsonParser parser, HttpClient client)
+		internal HalHttpClient(IHalJsonParser parser, HttpClient httpClient)
 		{
 			if (parser == null)
 				throw new ArgumentNullException(nameof(parser));
 
-			if (client == null)
-				throw new ArgumentNullException(nameof(client));
+			if (httpClient == null)
+				throw new ArgumentNullException(nameof(httpClient));
 
 			_parser = parser;
-			_client = client;
+			_httpClient = httpClient;
+
+			NonParsingHttpClient = new NonParsingHttpClient(httpClient);
+			Config = new HalHttpClientConfiguration(httpClient);
+
+			Config.Headers.Accept.Clear();
+			Config.Headers.Add("Accept", ApplicationHalJson);
 		}
 
-		public Uri BaseAddress
-		{
-			get { return _client.BaseAddress; }
-			set { _client.BaseAddress = value; }
-		}
-
-		public long MaxResponseContentBufferSize
-		{
-			get { return _client.MaxResponseContentBufferSize; }
-			set { _client.MaxResponseContentBufferSize = value; }
-		}
-
-		public TimeSpan Timeout
-		{
-			get { return _client.Timeout; }
-			set { _client.Timeout = value; }
-		}
-
-		public HttpRequestHeaders Headers => _client.DefaultRequestHeaders;
-
-		public CachingBehavior ApiRootResourceCachingBehavior { get; set; }
-
+		public IHalHttpClientConfiguration Config { get; }
+		
 		public async Task<IRootResourceObject> PostAsync<T>(Uri uri, T data)
 		{
-			ResetAcceptHeader();
-
-			var response = await _client.PostAsJsonAsync(uri, data);
+			var response = await NonParsingHttpClient.PostAsJsonAsync(uri, data);
 
 			return await ProcessResponseMessage(response);
 		}
 
 		public async Task<IRootResourceObject> PutAsync<T>(Uri uri, T data)
 		{
-			ResetAcceptHeader();
-
-			var response = await _client.PutAsJsonAsync(uri, data);
+			var response = await NonParsingHttpClient.PutAsJsonAsync(uri, data);
 
 			return await ProcessResponseMessage(response);
 		}
 
 		public async Task<IRootResourceObject> GetAsync(Uri uri)
 		{
-			ResetAcceptHeader();
-
-			var response = await _client.GetAsync(uri);
+			var response = await NonParsingHttpClient.GetAsync(uri);
 
 			return await ProcessResponseMessage(response);
 		}
 
 		public async Task<IRootResourceObject> DeleteAsync(Uri uri)
 		{
-			ResetAcceptHeader();
-
-			var response = await _client.DeleteAsync(uri);
+			var response = await NonParsingHttpClient.DeleteAsync(uri);
 
 			return await ProcessResponseMessage(response);
 		}
 
 		public async Task<IRootResourceObject> SendAsync(HttpRequestMessage request)
 		{
-			ResetAcceptHeader();
-
-			var response = await _client.SendAsync(request);
+			var response = await NonParsingHttpClient.SendAsync(request);
 
 			return await ProcessResponseMessage(response);
 		}
 
 		public IRootResourceObject CachedApiRootResource { get; set; }
+
+		public INonParsingHttpClient NonParsingHttpClient { get; }
 
 		private async Task<IRootResourceObject> ProcessResponseMessage(HttpResponseMessage response)
 		{
@@ -140,14 +117,6 @@ namespace HalClient.Net
 			return new RootResourceObject(result);
 		}
 
-		private void ResetAcceptHeader()
-		{
-			// FUTURE: Add support for application/hal+xml
-
-			_client.DefaultRequestHeaders.Accept.Clear();
-			_client.DefaultRequestHeaders.Add("Accept", ApplicationHalJson);
-		}
-
 		public void Dispose()
 		{
 			Dispose(true);
@@ -159,11 +128,11 @@ namespace HalClient.Net
 			if (!disposing)
 				return;
 
-			if (_client == null)
+			if (_httpClient == null)
 				return;
 
-			_client.Dispose();
-			_client = null;
+			_httpClient.Dispose();
+			_httpClient = null;
 		}
 	}
 }

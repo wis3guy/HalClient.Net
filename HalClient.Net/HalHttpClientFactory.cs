@@ -73,7 +73,7 @@ namespace HalClient.Net
 			return CreateHalHttpClientAsync(GetHttpClient(), apiRootCachingBehavior);
 		}
 
-		public Task<IHalHttpClient> CreateClientAsync(HttpMessageHandler httpMessageHandler, CachingBehavior apiRootCachingBehavior)
+		public Task<IHalHttpClient> CreateClientAsync(HttpMessageHandler httpMessageHandler, CachingBehavior apiRootCachingBehavior = CachingBehavior.Never)
 		{
 			if (httpMessageHandler == null)
 				throw new ArgumentNullException(nameof(httpMessageHandler));
@@ -81,7 +81,7 @@ namespace HalClient.Net
 			return CreateHalHttpClientAsync(GetHttpClient(httpMessageHandler), apiRootCachingBehavior);
 		}
 
-		public Task<IHalHttpClient> CreateClientAsync(HttpClient httpClient, CachingBehavior apiRootCachingBehavior)
+		public Task<IHalHttpClient> CreateClientAsync(HttpClient httpClient, CachingBehavior apiRootCachingBehavior = CachingBehavior.Never)
 		{
 			return CreateHalHttpClientAsync(httpClient, apiRootCachingBehavior);
 		}
@@ -94,7 +94,7 @@ namespace HalClient.Net
 			{
 				Configure(wrapped);
 
-				var decorated = Decorate(wrapped);
+				var decorated = Decorate(wrapped) ?? wrapped;
 
 				switch (apiRootCachingBehavior)
 				{
@@ -126,17 +126,19 @@ namespace HalClient.Net
 			if (httpClient == null)
 				throw new ArgumentNullException(nameof(httpClient));
 
-			var halHttpClient = new HalHttpClient(Parser, httpClient);
+			var wrapped = new HalHttpClient(Parser, httpClient);
 
 			try
 			{
-				Configure(halHttpClient);
-				var decorated = Decorate(halHttpClient);
+				Configure(wrapped);
+
+				var decorated = Decorate(wrapped) ?? wrapped;
+
 				return decorated;
 			}
 			catch (Exception)
 			{
-				halHttpClient.Dispose(); // client is unusable ...
+				wrapped.Dispose(); // client is unusable ...
 				throw;
 			}
 		}
@@ -175,36 +177,39 @@ namespace HalClient.Net
 			return CreateHalHttpClient(GetHttpClient(httpMessageHandler), context);
 		}
 
-		public Task<IHalHttpClient> CreateClientAsync(CachingBehavior apiRootCachingBehavior, T context)
+		public Task<IHalHttpClient> CreateClientAsync(T context, CachingBehavior apiRootCachingBehavior = CachingBehavior.Never)
 		{
-			return CreateHalHttpClientAsync(GetHttpClient(), apiRootCachingBehavior, context);
+			return CreateHalHttpClientAsync(GetHttpClient(), context, apiRootCachingBehavior);
 		}
 
-		public Task<IHalHttpClient> CreateClientAsync(HttpClient httpClient, CachingBehavior apiRootCachingBehavior, T context)
+		public Task<IHalHttpClient> CreateClientAsync(HttpClient httpClient, T context, CachingBehavior apiRootCachingBehavior = CachingBehavior.Never)
 		{
 			if (httpClient == null)
 				throw new ArgumentNullException(nameof(httpClient));
 
-			return CreateHalHttpClientAsync(httpClient, apiRootCachingBehavior, context);
+			return CreateHalHttpClientAsync(httpClient, context, apiRootCachingBehavior);
 		}
 
-		public Task<IHalHttpClient> CreateClientAsync(HttpMessageHandler httpMessageHandler, CachingBehavior apiRootCachingBehavior, T context)
+		public Task<IHalHttpClient> CreateClientAsync(HttpMessageHandler httpMessageHandler, T context, CachingBehavior apiRootCachingBehavior = CachingBehavior.Never)
 		{
 			if (httpMessageHandler == null)
 				throw new ArgumentNullException(nameof(httpMessageHandler));
 
-			return CreateHalHttpClientAsync(GetHttpClient(httpMessageHandler), apiRootCachingBehavior, context);
+			return CreateHalHttpClientAsync(GetHttpClient(httpMessageHandler), context, apiRootCachingBehavior);
 		}
 
-		private async Task<IHalHttpClient> CreateHalHttpClientAsync(HttpClient httpClient, CachingBehavior apiRootCachingBehavior, T context)
+		private async Task<IHalHttpClient> CreateHalHttpClientAsync(HttpClient httpClient, T context, CachingBehavior apiRootCachingBehavior)
 		{
+			if (httpClient == null)
+				throw new ArgumentNullException(nameof(httpClient));
+
 			var wrapped = new HalHttpClient(Parser, httpClient);
 
 			try
 			{
 				Configure(wrapped, context);
 
-				var decorated = Decorate(wrapped, context);
+				var decorated = Decorate(wrapped, context) ?? wrapped;
 
 				switch (apiRootCachingBehavior)
 				{
@@ -231,20 +236,19 @@ namespace HalClient.Net
 			}
 		}
 
-		private IHalHttpClient CreateHalHttpClient(HttpClient httpClient, T context, Action<HalHttpClient> preDecorate = null)
+		private IHalHttpClient CreateHalHttpClient(HttpClient httpClient, T context)
 		{
-			var halHttpClient = new HalHttpClient(Parser, httpClient);
+			var wrapped = new HalHttpClient(Parser, httpClient);
 
 			try
 			{
-				Configure(halHttpClient, context);
-				preDecorate?.Invoke(halHttpClient);
-				var decorated = Decorate(halHttpClient, context);
+				Configure(wrapped, context);
+				var decorated = Decorate(wrapped, context) ?? wrapped;
 				return decorated;
 			}
 			catch (Exception)
 			{
-				halHttpClient.Dispose(); // client is unusable ...
+				wrapped.Dispose(); // client is unusable ...
 				throw;
 			}
 		}

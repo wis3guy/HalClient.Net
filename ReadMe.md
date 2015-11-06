@@ -48,6 +48,26 @@ using (var client = factory.CreateClient())
 ##Advanced usage
 There are many ways you could customise the behaviour of `IHalHttpClient` instances and of the `HalHttpClientFactory`. Below is a list of scenarios and recommended approaches.
 
+####I want to cache the API root resource
+Many hypermedia powered API's expose their entry points as links in the root response. In order to embrace this paradigm, and reduce chatter, it is possible to have the `HalHttpClientFactory` retrieve and cache the root response for future reference.
+
+Possible `CachingBehavior` options are:
+
+Value | Description
+:--|:--
+`Never` | The API's root resource will not be automatically retrieved nor cached.
+`PerClient` | The API's root resource will be automatically retrieved and cached every time a `IHalHttpClient` instance is created and will remain cached as long as the client is not disposed.
+`Once` | The API's root resource will be automatically retrieved and cached when the first `IHalHttpClient` instance is created and will remain cached as long as the `HalHttpClientFactory` is not garbage collected.
+
+In order to make use of the built-in caching mechanism, use one of the awaitable `CreateClientAsync(CachingBehavior)` overloads.
+
+```c#
+using (var client = await factory.CreateClientAsync(CachingBehavior.PerClient))
+{
+	// client.CachedApiRootResource is set to a parsed IRootResourceObject instance
+}
+```
+
 ##I want to access a non-HAL resource
 In some situations, an HAL media type API may respond using a non-HAL content type for certain resources. Consider the download of an image or other binary. In these cases, you should use the `IHalClient.HttpClient` to do the communication.
 
@@ -85,19 +105,6 @@ The following options can be configured:
 `ApiRootResourceCachingBehavior ` | Tells the `HalHttpClientFactory` wether or not the API's root resource should be cached.
 
 > Note that, whatever `Accept` header you configure, the value will be overridden and set to `application/hal+json` unless you communicate using the `IHalHttpClient.HttpClient`.
-
-####ApiRootResourceCachingBehavior
-Most HAL based API's expose their entry points as links in the root response. In order to embrace this paradigm, it is possible to have the `HalHttpClientFactory` retrieve and cache the root response for future reference.
-
-Possible options for this property are:
-
-Value | Description
-:--|:--
-`Never` | The API's root resource will not be automatically retrieved nor cached.
-`PerClient` | The API's root resource will be automatically retrieved and cached every time a `IHalHttpClient` instance is created and will remain cached as long as the client is not disposed.
-`Once` | The API's root resource will be automatically retrieved and cached when the first `IHalHttpClient` instance is created and will remain cached as long as the `HalHttpClientFactory` is not garbage collected.
-
-Note that caching the API's root resource can reduce chatter, as this resource typically returns all hyperlinks needed to navigate the API. When interacting with an API that returns different hyperlinks in the root resource, based on authorization, opt to cache per client, otherwise cache once.
 
 ###I want to wrap all 'IHalHttpClient` instances in a custom object
 
@@ -191,12 +198,12 @@ public class CustomHalHttpClientFactory : HalHttpClientFactory
 ###I want to pass an adhoc context object to my `Configure` and/or `Decorate` overrides
 There are scenarios where you might need to pass a context object from the code calling `HalHttpClientFactory.Create()` to the custom `Configure` and/or `Decorate` overrides of you custom factory. This is typically useful when dealing with remote use impersonation, where your client makes API requests on behalf of a remote user.
 
-To help you deal with such situations, there is an abstract generic `HalHttpClientFactory<T>` class from which you can derive your custom factory.
+To help you deal with such situations, there is an abstract generic `HalHttpClientFactoryBase<T>` class from which you can derive your custom factory.
 
-Note that the abstract generic `HalHttpClientFactory<T>` class derives from the `HalHttpClientFactory` class, and thus allows for the same overrides.
+Note that the abstract generic `HalHttpClientFactoryBase<T>` class derives from the `HalHttpClientFactory` class, and thus allows for the same overrides.
 
 ```c#
-public class CustomHalHttpClientFactory : HalHttpClientFactory<string>
+public class CustomHalHttpClientFactory : HalHttpClientFactoryBase<string>
 {
 	public CustomHalHttpClientFactory(IHalJsonParser parser) : base(parser)
 	{
@@ -205,28 +212,28 @@ public class CustomHalHttpClientFactory : HalHttpClientFactory<string>
 	protected override void Configure(IHalHttpClientConfiguration config)
 	{
 		//
-		// Custom Configure, in case a context was *not* specified in the Create() call
+		// Custom Configure, in case a context was *not* specified in the CreateClient() call
 		//
 	}
 
 	protected override void Configure(IHalHttpClientConfiguration config, string context)
 	{
 		//
-		// Custom Configure, in case a context was specified in the Create() call
+		// Custom Configure, in case a context was specified in the CreateClient() call
 		//
 	}
 
 	protected override IHalHttpClient Decorate(IHalHttpClient original)
 	{
 		//
-		// Custom Decorate, in case a context was *not* specified in the Create() call
+		// Custom Decorate, in case a context was *not* specified in the CreateClient() call
 		//
 	}
 
 	protected override IHalHttpClient Decorate(IHalHttpClient original, string context)
 	{
 		//
-		// Custom Decorate, in case a context was specified in the Create() call
+		// Custom Decorate, in case a context was specified in the CreateClient() call
 		//
 	}
 }

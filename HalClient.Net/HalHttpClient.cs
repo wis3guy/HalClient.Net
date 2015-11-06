@@ -1,6 +1,9 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using HalClient.Net.Parser;
 
@@ -25,44 +28,56 @@ namespace HalClient.Net
 
 			HttpClient = new NonParsingHttpClient(httpClient);
 			Config = new HalHttpClientConfiguration(httpClient);
-
-			Config.Headers.Accept.Clear();
-			Config.Headers.Add("Accept", ApplicationHalJson);
 		}
 
 		public IHalHttpClientConfiguration Config { get; }
 		
 		public async Task<IRootResourceObject> PostAsync<T>(Uri uri, T data)
 		{
+			var backup = OverrideAcceptHeaders();
 			var response = await HttpClient.PostAsJsonAsync(uri, data);
+			
+			RestoreAcceptHeaders(backup);
 
 			return await ProcessResponseMessage(response);
 		}
 
 		public async Task<IRootResourceObject> PutAsync<T>(Uri uri, T data)
 		{
+			var backup = OverrideAcceptHeaders();
 			var response = await HttpClient.PutAsJsonAsync(uri, data);
+
+			RestoreAcceptHeaders(backup);
 
 			return await ProcessResponseMessage(response);
 		}
 
 		public async Task<IRootResourceObject> GetAsync(Uri uri)
 		{
+			var backup = OverrideAcceptHeaders();
 			var response = await HttpClient.GetAsync(uri);
+
+			RestoreAcceptHeaders(backup);
 
 			return await ProcessResponseMessage(response);
 		}
 
 		public async Task<IRootResourceObject> DeleteAsync(Uri uri)
 		{
+			var backup = OverrideAcceptHeaders();
 			var response = await HttpClient.DeleteAsync(uri);
+
+			RestoreAcceptHeaders(backup);
 
 			return await ProcessResponseMessage(response);
 		}
 
 		public async Task<IRootResourceObject> SendAsync(HttpRequestMessage request)
 		{
+			var backup = OverrideAcceptHeaders();
 			var response = await HttpClient.SendAsync(request);
+
+			RestoreAcceptHeaders(backup);
 
 			return await ProcessResponseMessage(response);
 		}
@@ -70,6 +85,24 @@ namespace HalClient.Net
 		public IRootResourceObject CachedApiRootResource { get; set; }
 
 		public INonParsingHttpClient HttpClient { get; }
+
+		private void RestoreAcceptHeaders(IEnumerable<MediaTypeWithQualityHeaderValue> backup)
+		{
+			Config.Headers.Accept.Clear();
+
+			foreach (var headerValue in backup)
+				Config.Headers.Accept.Add(headerValue);
+		}
+
+		private MediaTypeWithQualityHeaderValue[] OverrideAcceptHeaders()
+		{
+			var backup = Config.Headers.Accept.ToArray();
+
+			Config.Headers.Accept.Clear();
+			Config.Headers.Add("Accept", ApplicationHalJson);
+
+			return backup;
+		}
 
 		private async Task<IRootResourceObject> ProcessResponseMessage(HttpResponseMessage response)
 		{

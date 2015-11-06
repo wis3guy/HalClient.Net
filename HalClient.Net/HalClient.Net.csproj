@@ -57,7 +57,10 @@
   <ItemGroup>
     <Compile Include="CachingBehavior.cs" />
     <Compile Include="HalHttpClientFactory.cs" />
+    <Compile Include="HalHttpClientConfiguration.cs" />
     <Compile Include="HalHttpRequestException.cs" />
+    <Compile Include="INonParsingHttpClient.cs" />
+    <Compile Include="NonParsingHttpClient.cs" />
     <Compile Include="Parser\EmbeddedResourceObject.cs" />
     <Compile Include="Parser\HalJsonParseResult.cs" />
     <Compile Include="Parser\IEmbeddedResourceObject.cs" />

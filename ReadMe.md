@@ -48,6 +48,9 @@ using (var client = factory.CreateClient())
 ##Advanced usage
 There are many ways you could customise the behaviour of `IHalHttpClient` instances and of the `HalHttpClientFactory`. Below is a list of scenarios and recommended approaches.
 
+##I want to access a non-HAL resource
+In some situations, an HAL media type API may respond using a non-HAL content type for certain resources. Consider the download of an image or other binary. In these cases, you should use the `IHalClient.HttpClient` to do the communication.
+
 ###I want to apply common configuration to all `IHalHttpClient` instances
 If you want to configure all instantiated `IHalHttpClient` objects consistently, you should create a custom factory.
 
@@ -80,6 +83,8 @@ The following options can be configured:
 `MaxResponseContentBufferSize` | Exposes the `MaxResponseContentBufferSize` property of the underlying `HttpClient` instance.
 `Timeout` | Exposes the `Timeout ` property of the underlying `HttpClient` instance.
 `ApiRootResourceCachingBehavior ` | Tells the `HalHttpClientFactory` wether or not the API's root resource should be cached.
+
+> Note that, whatever `Accept` header you configure, the value will be overridden and set to `application/hal+json` unless you communicate using the `IHalHttpClient.HttpClient`.
 
 ####ApiRootResourceCachingBehavior
 Most HAL based API's expose their entry points as links in the root response. In order to embrace this paradigm, it is possible to have the `HalHttpClientFactory` retrieve and cache the root response for future reference.
@@ -355,6 +360,10 @@ public sealed class CustomHalHttpClientFactory : HalHttpClientFactory
 	}
 }
 ```
+
+##Thread-safety
+* `IHalHttpClientFactory` instances are thread-safe;
+* `IHalHttpClient` instances are **not** thread-safe;
 
 ##Error handling
 Handling errors, when using a `IHalHttpClient` is no different from when using a regular `HttpClient`. Given the asynchronous nature, you should catch `AggregateException` and deal with the inner exceptions.

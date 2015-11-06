@@ -68,7 +68,7 @@ namespace HalClient.Net
 
 			try
 			{
-				Configure(wrapped, context);
+				Configure(wrapped.Configuration, context);
 
 				var decorated = Decorate(wrapped, context) ?? wrapped;
 
@@ -77,11 +77,11 @@ namespace HalClient.Net
 					case CachingBehavior.Never:
 						break;
 					case CachingBehavior.PerClient:
-						var apiRootResource = await GetFreshRootResourceAsync(decorated, wrapped).ConfigureAwait(false);
+						var apiRootResource = await GetFreshRootResourceAsync(decorated, wrapped.Configuration).ConfigureAwait(false);
 						wrapped.CachedApiRootResource = apiRootResource;
 						break;
 					case CachingBehavior.Once:
-						_cachedApiRootResource = _cachedApiRootResource ?? await GetFreshRootResourceAsync(decorated, wrapped).ConfigureAwait(false);
+						_cachedApiRootResource = _cachedApiRootResource ?? await GetFreshRootResourceAsync(decorated, wrapped.Configuration).ConfigureAwait(false);
 						wrapped.CachedApiRootResource = _cachedApiRootResource;
 						break;
 					default:
@@ -103,7 +103,7 @@ namespace HalClient.Net
 
 			try
 			{
-				Configure(wrapped, context);
+				Configure(wrapped.Configuration, context);
 				var decorated = Decorate(wrapped, context) ?? wrapped;
 				return decorated;
 			}

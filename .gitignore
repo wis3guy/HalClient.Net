@@ -183,4 +183,4 @@ FakesAssemblies/
 *.nupkg
 
 # Copied Readme.txt (from Readme.md)
-HalClient.Net/ReadMe.txt
+.vs/

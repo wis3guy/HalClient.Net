@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Net.Http;
-using System.Threading.Tasks;
 using HalClient.Net.Parser;
 
 namespace HalClient.Net
@@ -88,11 +87,11 @@ namespace HalClient.Net
 
 			try
 			{
-				Configure(halHttpClient);
+				Configure(halHttpClient.Config);
 
 				var transformed = Decorate(halHttpClient);
 
-				halHttpClient.CachedApiRootResource = GetApiRootResource(transformed, halHttpClient);
+				halHttpClient.CachedApiRootResource = GetApiRootResource(transformed, halHttpClient.Config);
 
 				return transformed;
 			}
@@ -142,11 +141,11 @@ namespace HalClient.Net
 
 			try
 			{
-				Configure(halHttpClient, context);
+				Configure(halHttpClient.Config, context);
 
 				var transformed = Decorate(halHttpClient, context);
 
-				halHttpClient.CachedApiRootResource = GetApiRootResource(transformed, halHttpClient);
+				halHttpClient.CachedApiRootResource = GetApiRootResource(transformed, halHttpClient.Config);
 
 				return transformed;
 			}

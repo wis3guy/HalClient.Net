@@ -23,7 +23,7 @@ namespace HalClient.Net
 			_parser = parser;
 			_httpClient = httpClient;
 
-			NonParsingHttpClient = new NonParsingHttpClient(httpClient);
+			HttpClient = new NonParsingHttpClient(httpClient);
 			Config = new HalHttpClientConfiguration(httpClient);
 
 			Config.Headers.Accept.Clear();
@@ -34,42 +34,42 @@ namespace HalClient.Net
 		
 		public async Task<IRootResourceObject> PostAsync<T>(Uri uri, T data)
 		{
-			var response = await NonParsingHttpClient.PostAsJsonAsync(uri, data);
+			var response = await HttpClient.PostAsJsonAsync(uri, data);
 
 			return await ProcessResponseMessage(response);
 		}
 
 		public async Task<IRootResourceObject> PutAsync<T>(Uri uri, T data)
 		{
-			var response = await NonParsingHttpClient.PutAsJsonAsync(uri, data);
+			var response = await HttpClient.PutAsJsonAsync(uri, data);
 
 			return await ProcessResponseMessage(response);
 		}
 
 		public async Task<IRootResourceObject> GetAsync(Uri uri)
 		{
-			var response = await NonParsingHttpClient.GetAsync(uri);
+			var response = await HttpClient.GetAsync(uri);
 
 			return await ProcessResponseMessage(response);
 		}
 
 		public async Task<IRootResourceObject> DeleteAsync(Uri uri)
 		{
-			var response = await NonParsingHttpClient.DeleteAsync(uri);
+			var response = await HttpClient.DeleteAsync(uri);
 
 			return await ProcessResponseMessage(response);
 		}
 
 		public async Task<IRootResourceObject> SendAsync(HttpRequestMessage request)
 		{
-			var response = await NonParsingHttpClient.SendAsync(request);
+			var response = await HttpClient.SendAsync(request);
 
 			return await ProcessResponseMessage(response);
 		}
 
 		public IRootResourceObject CachedApiRootResource { get; set; }
 
-		public INonParsingHttpClient NonParsingHttpClient { get; }
+		public INonParsingHttpClient HttpClient { get; }
 
 		private async Task<IRootResourceObject> ProcessResponseMessage(HttpResponseMessage response)
 		{

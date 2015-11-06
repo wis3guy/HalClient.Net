@@ -39,7 +39,7 @@ namespace HalClient.Net
 			return new HttpClient(httpMessageHandler);
 		}
 
-		private static async Task<IRootResourceObject> GetFreshRootResourceAsync(IHalHttpClient client, IHalHttpClientConfiguration config)
+		protected static async Task<IRootResourceObject> GetFreshRootResourceAsync(IHalHttpClient client, IHalHttpClientConfiguration config)
 		{
 			if (config.BaseAddress == null)
 				throw new InvalidOperationException("The root resource can only be requested for caching if the BaseAddress of the client is initialized in the Configure method of the factory.");
@@ -49,7 +49,7 @@ namespace HalClient.Net
 
 		public IHalHttpClient CreateClient()
 		{
-			return CreateHalHttpClient(GetHttpClient()).Decorated;
+			return CreateHalHttpClient(GetHttpClient());
 		}
 
 		public IHalHttpClient CreateClient(HttpClient httpClient)
@@ -57,7 +57,7 @@ namespace HalClient.Net
 			if (httpClient == null)
 				throw new ArgumentNullException(nameof(httpClient));
 
-			return CreateHalHttpClient(httpClient).Decorated;
+			return CreateHalHttpClient(httpClient);
 		}
 
 		public IHalHttpClient CreateClient(HttpMessageHandler httpMessageHandler)
@@ -65,47 +65,63 @@ namespace HalClient.Net
 			if (httpMessageHandler == null)
 				throw new ArgumentNullException(nameof(httpMessageHandler));
 
-			return CreateHalHttpClient(GetHttpClient(httpMessageHandler)).Decorated;
+			return CreateHalHttpClient(GetHttpClient(httpMessageHandler));
 		}
 
-		public async Task<IHalHttpClient> CreateClientAsync(CachingBehavior apiRootCachingBehavior)
+		public Task<IHalHttpClient> CreateClientAsync(CachingBehavior apiRootCachingBehavior)
 		{
-			return await CreateHalHttpClientAsync(GetHttpClient(), apiRootCachingBehavior);
+			return CreateHalHttpClientAsync(GetHttpClient(), apiRootCachingBehavior);
 		}
 
-		public async Task<IHalHttpClient> CreateClientAsync(HttpMessageHandler httpMessageHandler, CachingBehavior apiRootCachingBehavior)
+		public Task<IHalHttpClient> CreateClientAsync(HttpMessageHandler httpMessageHandler, CachingBehavior apiRootCachingBehavior)
 		{
 			if (httpMessageHandler == null)
 				throw new ArgumentNullException(nameof(httpMessageHandler));
 
-			return await CreateHalHttpClientAsync(GetHttpClient(httpMessageHandler), apiRootCachingBehavior);
+			return CreateHalHttpClientAsync(GetHttpClient(httpMessageHandler), apiRootCachingBehavior);
 		}
 
-		public async Task<IHalHttpClient> CreateClientAsync(HttpClient httpClient, CachingBehavior apiRootCachingBehavior)
+		public Task<IHalHttpClient> CreateClientAsync(HttpClient httpClient, CachingBehavior apiRootCachingBehavior)
 		{
-			return await CreateHalHttpClientAsync(httpClient, apiRootCachingBehavior);
+			return CreateHalHttpClientAsync(httpClient, apiRootCachingBehavior);
 		}
 
 		private async Task<IHalHttpClient> CreateHalHttpClientAsync(HttpClient httpClient, CachingBehavior apiRootCachingBehavior)
 		{
-			var created = CreateHalHttpClient(httpClient);
+			var wrapped = new HalHttpClient(Parser, httpClient);
 
-			switch (apiRootCachingBehavior)
+			try
 			{
-				case CachingBehavior.PerClient:
-					var apiRootResource = await GetFreshRootResourceAsync(created.Decorated, created.Wrapped);
-					created.Wrapped.CachedApiRootResource = apiRootResource;
-					break;
-				case CachingBehavior.Once:
-					_cachedApiRootResource = _cachedApiRootResource ?? await GetFreshRootResourceAsync(created.Decorated, created.Wrapped);
-					created.Wrapped.CachedApiRootResource = _cachedApiRootResource;
-					break;
-			}
+				Configure(wrapped);
 
-			return created.Decorated;
+				var decorated = Decorate(wrapped);
+
+				switch (apiRootCachingBehavior)
+				{
+					case CachingBehavior.Never:
+						break;
+					case CachingBehavior.PerClient:
+						var apiRootResource = await GetFreshRootResourceAsync(decorated, wrapped).ConfigureAwait(false);
+						wrapped.CachedApiRootResource = apiRootResource;
+						break;
+					case CachingBehavior.Once:
+						_cachedApiRootResource = _cachedApiRootResource ?? await GetFreshRootResourceAsync(decorated, wrapped).ConfigureAwait(false);
+						wrapped.CachedApiRootResource = _cachedApiRootResource;
+						break;
+					default:
+						throw new ArgumentOutOfRangeException(nameof(apiRootCachingBehavior), apiRootCachingBehavior, null);
+				}
+
+				return decorated;
+			}
+			catch (Exception)
+			{
+				wrapped.Dispose(); // client is unusable ...
+				throw;
+			}
 		}
 
-		private CreatedHalHttpClient CreateHalHttpClient(HttpClient httpClient)
+		private IHalHttpClient CreateHalHttpClient(HttpClient httpClient)
 		{
 			if (httpClient == null)
 				throw new ArgumentNullException(nameof(httpClient));
@@ -115,8 +131,8 @@ namespace HalClient.Net
 			try
 			{
 				Configure(halHttpClient);
-
-				return new CreatedHalHttpClient(Decorate(halHttpClient), halHttpClient);
+				var decorated = Decorate(halHttpClient);
+				return decorated;
 			}
 			catch (Exception)
 			{
@@ -126,26 +142,10 @@ namespace HalClient.Net
 		}
 	}
 
-	internal class CreatedHalHttpClient
-	{
-		public CreatedHalHttpClient(IHalHttpClient decorated, HalHttpClient wrapped)
-		{
-			if (decorated == null)
-				throw new ArgumentNullException(nameof(decorated));
-
-			if (wrapped == null)
-				throw new ArgumentNullException(nameof(wrapped));
-
-			Decorated = decorated;
-			Wrapped = wrapped;
-		}
-
-		public IHalHttpClient Decorated { get; }
-		public HalHttpClient Wrapped { get; }
-	}
-
 	public abstract class HalHttpClientFactory<T> : HalHttpClientFactory, IHalHttpClientFactory<T>
 	{
+		private IRootResourceObject _cachedApiRootResource;
+
 		protected HalHttpClientFactory(IHalJsonParser parser) : base(parser)
 		{
 		}
@@ -156,7 +156,7 @@ namespace HalClient.Net
 
 		public IHalHttpClient CreateClient(T context)
 		{
-			return CreateClient(GetHttpClient(), context);
+			return CreateHalHttpClient(GetHttpClient(), context);
 		}
 
 		public IHalHttpClient CreateClient(HttpClient httpClient, T context)
@@ -164,23 +164,7 @@ namespace HalClient.Net
 			if (httpClient == null)
 				throw new ArgumentNullException(nameof(httpClient));
 
-			var halHttpClient = new HalHttpClient(Parser, httpClient);
-
-			try
-			{
-				Configure(halHttpClient, context);
-
-				var decorated = Decorate(halHttpClient, context);
-
-				halHttpClient.CachedApiRootResource = GetApiRootResource(decorated, halHttpClient);
-
-				return decorated;
-			}
-			catch (Exception)
-			{
-				halHttpClient.Dispose(); // client is unusable ...
-				throw;
-			}
+			return CreateHalHttpClient(httpClient, context);
 		}
 
 		public IHalHttpClient CreateClient(HttpMessageHandler httpMessageHandler, T context)
@@ -188,7 +172,81 @@ namespace HalClient.Net
 			if (httpMessageHandler == null)
 				throw new ArgumentNullException(nameof(httpMessageHandler));
 
-			return CreateClient(GetHttpClient(httpMessageHandler), context);
+			return CreateHalHttpClient(GetHttpClient(httpMessageHandler), context);
+		}
+
+		public Task<IHalHttpClient> CreateClientAsync(CachingBehavior apiRootCachingBehavior, T context)
+		{
+			return CreateHalHttpClientAsync(GetHttpClient(), apiRootCachingBehavior, context);
+		}
+
+		public Task<IHalHttpClient> CreateClientAsync(HttpClient httpClient, CachingBehavior apiRootCachingBehavior, T context)
+		{
+			if (httpClient == null)
+				throw new ArgumentNullException(nameof(httpClient));
+
+			return CreateHalHttpClientAsync(httpClient, apiRootCachingBehavior, context);
+		}
+
+		public Task<IHalHttpClient> CreateClientAsync(HttpMessageHandler httpMessageHandler, CachingBehavior apiRootCachingBehavior, T context)
+		{
+			if (httpMessageHandler == null)
+				throw new ArgumentNullException(nameof(httpMessageHandler));
+
+			return CreateHalHttpClientAsync(GetHttpClient(httpMessageHandler), apiRootCachingBehavior, context);
+		}
+
+		private async Task<IHalHttpClient> CreateHalHttpClientAsync(HttpClient httpClient, CachingBehavior apiRootCachingBehavior, T context)
+		{
+			var wrapped = new HalHttpClient(Parser, httpClient);
+
+			try
+			{
+				Configure(wrapped, context);
+
+				var decorated = Decorate(wrapped, context);
+
+				switch (apiRootCachingBehavior)
+				{
+					case CachingBehavior.Never:
+						break;
+					case CachingBehavior.PerClient:
+						var apiRootResource = await GetFreshRootResourceAsync(decorated, wrapped).ConfigureAwait(false);
+						wrapped.CachedApiRootResource = apiRootResource;
+						break;
+					case CachingBehavior.Once:
+						_cachedApiRootResource = _cachedApiRootResource ?? await GetFreshRootResourceAsync(decorated, wrapped).ConfigureAwait(false);
+						wrapped.CachedApiRootResource = _cachedApiRootResource;
+						break;
+					default:
+						throw new ArgumentOutOfRangeException(nameof(apiRootCachingBehavior), apiRootCachingBehavior, null);
+				}
+
+				return decorated;
+			}
+			catch (Exception)
+			{
+				wrapped.Dispose(); // client is unusable ...
+				throw;
+			}
+		}
+
+		private IHalHttpClient CreateHalHttpClient(HttpClient httpClient, T context, Action<HalHttpClient> preDecorate = null)
+		{
+			var halHttpClient = new HalHttpClient(Parser, httpClient);
+
+			try
+			{
+				Configure(halHttpClient, context);
+				preDecorate?.Invoke(halHttpClient);
+				var decorated = Decorate(halHttpClient, context);
+				return decorated;
+			}
+			catch (Exception)
+			{
+				halHttpClient.Dispose(); // client is unusable ...
+				throw;
+			}
 		}
 	}
 }

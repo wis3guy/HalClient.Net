@@ -2,8 +2,8 @@
 A specialised http client  that simplifies communicating with API's that support the HAL media type.
 
 ##HAL Specification resources
-* https://github.com/mikekelly/hal_specification
-* https://tools.ietf.org/html/draft-kelly-json-hal-06
+* [hal_specification](https://github.com/mikekelly/hal_specification)
+* [draft-kelly-json-hal-06](https://tools.ietf.org/html/draft-kelly-json-hal-06)
 
 ##Why a specialised `HttpClient`
 Dealing with the responses from a HAL enabled API can be tedious. As a consumer you repeatedly need to extract the links, embedded resources and state values to be able to reason about these entities. This client aims to be a thin wrapper around the `HttpClient` that takes care of the initial parsing of HAL responses. In most cases, consuming code does not need to do any parsing so it can focus on interpreting.
@@ -44,6 +44,46 @@ using (var client = factory.CreateClient())
 ```
 
 > Note that the client is disposable!
+
+###Working with `ILinkObject` instances
+After parsing the `application/hal+json` response from the API, the returned resource contains a dictionary of links as they were encounteres in the `_links` property of the resource. The key in this dictionary is the link's `rel`, the value of each pair in the dictionary, is an `IEnumerable<ILinkObject>`. The reason for this being an enumerable is that the response might contain multiple links with the same `rel` attribute.
+
+Each `ILinkObject` instance represents a link, as defined in [RFC5988](https://tools.ietf.org/html/rfc5988). Note that as specified in the [hal spec](https://tools.ietf.org/html/draft-kelly-json-hal-06), links may be provided as URI templates as defined in [RFC6570](http://tools.ietf.org/html/rfc6570). `ILinkObject` instances can subsequently represent templated or non templated links. In case the link is templated, the `Href` property will be `null` and the `Template` property will represent the template. Alternatively, the `Href` will be set to a vilud `Uri` and the `Template` will be `null`. Below is the recommended way of working with links.
+
+```c#
+//
+// In case of embedded resources, you might have many links with the same rel ...
+//
+
+var productLinks = resource.Links["product"]; // list of links to all embedded products
+
+Assert.IsTrue(productLinks.Any());
+
+//
+// A self link is never templated, and there is only 1 ...
+//
+
+var selfLink = resource.Links["self"].Single();
+
+Assert.IsFalse(selfLink.Templated);
+Assert.IsNull(selfLink.Template);
+
+//
+// Here we can export a resource in various formats
+//
+
+var exportLink = resource.Links["export"].Single();
+
+Assert.IsTrue(exportLink.Templated);
+
+var resolved = exportLink.ResolveTemplated(x => x.AddParameter("format", "xml").Resolve());
+
+Assert.IsFalse(resolved.Templated);
+Assert.IsNull(resolved.Template);
+```
+Note that the `ResolveTemplated` returns a new `ILinkObject` instance, which is no longer templated. Although it is possible to instruct the `UriTemplate` instance, passed into the `Func<UriTemplate, string>` you **should not** do partial parameter replacements as the resulting `ILinkObject` will no longer allow you to replace other parameters.
+
+For more info on how to use the `UriTemplate` class, please visit: [Tavis.UriTemplates](https://github.com/tavis-software/Tavis.UriTemplates)
 
 ##Advanced usage
 There are many ways you could customise the behaviour of `IHalHttpClient` instances and of the `HalHttpClientFactory`. Below is a list of scenarios and recommended approaches.
@@ -410,7 +450,7 @@ catch (AggregateException aggregate)
 }
 catch(HalHttpRequestException e)
 {
-    //
+	//
 	// Deal with the error ...
 	//
 }

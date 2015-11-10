@@ -408,6 +408,12 @@ catch (AggregateException aggregate)
 		return false;
 	});	
 }
+catch(HalHttpRequestException e)
+{
+    //
+	// Deal with the error ...
+	//
+}
 ```
 
 ##Nuget
@@ -419,4 +425,4 @@ This library has spawned from an adhoc need i had to communicate with one of my 
 As with any library, it may not suit all of your use cases. I am very much interested in your particular use cases and am eager to improve the library. Feel free to create an Issue or (even better) a Pull Request. 
 
 ##Credits
-The parser makes use of Darrel Miller's UriTemplates project: https://github.com/tavis-software/UriTemplates
+The parser makes use of Darrel Miller's UriTemplates project: https://github.com/tavis-software/Tavis.UriTemplates

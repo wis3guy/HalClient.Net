@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Tavis.UriTemplates;
 
 namespace HalClient.Net.Parser
 {
@@ -84,6 +85,7 @@ namespace HalClient.Net.Parser
 		private static LinkObject ParseLinkObject(JObject outer, string rel)
 		{
 			var link = new LinkObject {Rel = rel};
+			string href = null;
 
 			foreach (var inner in outer.Properties())
 			{
@@ -92,10 +94,12 @@ namespace HalClient.Net.Parser
 				if (string.IsNullOrEmpty(value))
 					continue; // nothing to assign, just leave the default value ...
 
-				switch (inner.Name.ToLowerInvariant())
+				var attribute = inner.Name.ToLowerInvariant();
+
+				switch (attribute)
 				{
 					case "href":
-						link.Href = TryCreateUri(value, UriKind.RelativeOrAbsolute);
+						href = value;
 						break;
 					case "templated":
 						link.Templated = value.Equals("true", StringComparison.OrdinalIgnoreCase);
@@ -104,13 +108,13 @@ namespace HalClient.Net.Parser
 						link.Type = value;
 						break;
 					case "deprication":
-						link.Deprecation = TryCreateUri(value, UriKind.Absolute);
+						link.SetDeprecation(value);
 						break;
 					case "name":
 						link.Name = value;
 						break;
 					case "profile":
-						link.Profile = TryCreateUri(value, UriKind.Absolute);
+						link.SetProfile(value);
 						break;
 					case "title":
 						link.Title = value;
@@ -118,8 +122,15 @@ namespace HalClient.Net.Parser
 					case "hreflang":
 						link.HrefLang = value;
 						break;
+					default:
+						throw new NotSupportedException("Unsupported link attribute encountered: " + attribute);
 				}
 			}
+
+			if (link.Templated)
+				link.Template = href;
+			else
+				link.SetHref(href);
 
 			return link;
 		}
@@ -135,18 +146,6 @@ namespace HalClient.Net.Parser
 						yield return factory(child, rel);
 				else
 					yield return factory((JObject) inner.Value, rel);
-			}
-		}
-
-		private static Uri TryCreateUri(string value, UriKind kind)
-		{
-			try
-			{
-				return new Uri(value, kind);
-			}
-			catch (UriFormatException)
-			{
-				return null;
 			}
 		}
 	}

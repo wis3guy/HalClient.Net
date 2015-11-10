@@ -67,6 +67,7 @@ var selfLink = resource.Links["self"].Single();
 
 Assert.IsFalse(selfLink.Templated);
 Assert.IsNull(selfLink.Template);
+Assert.IsNotNull(selfLink.Href);
 
 //
 // Here we can export a resource in various formats
@@ -75,11 +76,14 @@ Assert.IsNull(selfLink.Template);
 var exportLink = resource.Links["export"].Single();
 
 Assert.IsTrue(exportLink.Templated);
+Assert.IsNotNull(exportLink.Template);
+Assert.IsNull(exportLink.Href);
 
 var resolved = exportLink.ResolveTemplated(x => x.AddParameter("format", "xml").Resolve());
 
 Assert.IsFalse(resolved.Templated);
 Assert.IsNull(resolved.Template);
+Assert.IsNotNull(resolved.Href);
 ```
 Note that the `ResolveTemplated` returns a new `ILinkObject` instance, which is no longer templated. Although it is possible to instruct the `UriTemplate` instance, passed into the `Func<UriTemplate, string>` you **should not** do partial parameter replacements as the resulting `ILinkObject` will no longer allow you to replace other parameters.
 

@@ -53,6 +53,57 @@ namespace HalClient.Net.Tests
 	}
 }";
 
+		private const string JsonNullEmbedded = @"
+{
+	""_links"": {
+		""self"": { ""href"": ""/orders"" },
+		""curies"": [{ ""name"": ""ea"", ""href"": ""http://example.com/docs/rels/{rel}"", ""templated"": true }],
+		""next"": { ""href"": ""/orders?page=2"" },
+		""ea:find"": {
+			""href"": ""/orders{?id}"",
+			""templated"": true
+		},
+		""ea:admin"": [{
+			""href"": ""/admins/2"",
+			""title"": ""Fred""
+		}, {
+			""href"": ""/admins/5"",
+			""title"": ""Kate""
+		}]
+	},
+	""currentlyProcessing"": 14,
+	""shippedToday"": 20,
+	""_embedded"": null
+}";
+
+		private const string JsonNullLinks = @"
+{
+	""_links"": null,
+	""currentlyProcessing"": 14,
+	""shippedToday"": 20,
+	""_embedded"": {
+		""ea:order"": [{
+			""_links"": {
+				""self"": { ""href"": ""/orders/123"" },
+				""ea:basket"": { ""href"": ""/baskets/98712"" },
+				""ea:customer"": { ""href"": ""/customers/7809"" }
+			},
+			""total"": 30.00,
+			""currency"": ""USD"",
+			""status"": ""shipped""
+		}, {
+			""_links"": {
+				""self"": { ""href"": ""/orders/124"" },
+				""ea:basket"": { ""href"": ""/baskets/97213"" },
+				""ea:customer"": { ""href"": ""/customers/12369"" }
+			},
+			""total"": 20.00,
+			""currency"": ""USD"",
+			""status"": ""processing""
+		}]
+	}
+}";
+
 		private readonly HalJsonParser _sut = new HalJsonParser();
 
 		[Fact]
@@ -97,6 +148,14 @@ namespace HalClient.Net.Tests
 			Assert.Equal((30.00f).ToString(CultureInfo.CurrentCulture), order.State["total"].Value);
 			Assert.Equal("USD", order.State["currency"].Value);
 			Assert.Equal("shipped", order.State["status"].Value);
+		}
+
+		[Fact]
+		public void EmbeddedParsing_ParsesNullEmbedded()
+		{
+			var result = _sut.Parse(JsonNullEmbedded);
+
+			Assert.Equal(5, result.Links.Select(x => x.Rel).Distinct().Count());
 		}
 
 		[Fact]
@@ -159,6 +218,14 @@ namespace HalClient.Net.Tests
 
 			Assert.True(result.Links.Where(x => x.Rel == "ea:admin").Any(x => x.Title.Equals("Kate")));
 			Assert.True(result.Links.Where(x => x.Rel == "ea:admin").Any(x => x.Title.Equals("Fred")));
+		}
+
+		[Fact]
+		public void LinksParsing_ParsesNullLinks()
+		{
+			var result = _sut.Parse(JsonNullLinks);
+
+			Assert.Equal(2, result.EmbeddedResources.Count());
 		}
 	}
 }

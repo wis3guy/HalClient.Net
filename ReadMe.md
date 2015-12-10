@@ -1,6 +1,8 @@
 #HalClient.Net 
 A specialised http client  that simplifies communicating with API's that support the HAL media type.
 
+[![Build status](https://ci.appveyor.com/api/projects/status/klqo0binme3x9k3b/branch/master?svg=true)](https://ci.appveyor.com/project/wis3guy/halclient-net/branch/master)
+
 ##HAL Specification resources
 * [hal_specification](https://github.com/mikekelly/hal_specification)
 * [draft-kelly-json-hal-06](https://tools.ietf.org/html/draft-kelly-json-hal-06)
@@ -462,11 +464,6 @@ catch(HalHttpRequestException e)
 
 ##Nuget
 A nuget package for this library is available here: https://www.nuget.org/packages/HalClient.Net/
-
-##Build:
-
-* [![Build status](https://ci.appveyor.com/api/projects/status/klqo0binme3x9k3b/branch/master?svg=true)](https://ci.appveyor.com/project/wis3guy/halclient-net/branch/master) master
-* [![Build status](https://ci.appveyor.com/api/projects/status/klqo0binme3x9k3b?svg=true)](https://ci.appveyor.com/project/wis3guy/halclient-net) entire project
 
 ##Work in progress
 This library has spawned from an adhoc need i had to communicate with one of my own API's, which uses (WebApi.Hal)[https://github.com/JakeGinnivan/WebApi.Hal]. As time progressed, my experience with the mediatype grew and my needs changed. this has led to many small and big changes to the library.

@@ -13,6 +13,6 @@ namespace HalClient.Net
 		Task<IRootResourceObject> DeleteAsync(Uri uri);
 		Task<IRootResourceObject> SendAsync(HttpRequestMessage request);
 		IRootResourceObject CachedApiRootResource { get; }
-		INonParsingHttpClient HttpClient { get; }
+		HttpClient HttpClient { get; }
 	}
 }

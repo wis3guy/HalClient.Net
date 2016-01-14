@@ -26,7 +26,6 @@ namespace HalClient.Net
 			_parser = parser;
 			_httpClient = httpClient;
 
-			HttpClient = new NonParsingHttpClient(httpClient);
 			Configuration = new HalHttpClientConfiguration(httpClient);
 		}
 
@@ -35,7 +34,7 @@ namespace HalClient.Net
 		public async Task<IRootResourceObject> PostAsync<T>(Uri uri, T data)
 		{
 			var backup = OverrideAcceptHeaders();
-			var response = await HttpClient.PostAsJsonAsync(uri, data);
+			var response = await _httpClient.PostAsJsonAsync(uri, data);
 			
 			RestoreAcceptHeaders(backup);
 
@@ -45,7 +44,7 @@ namespace HalClient.Net
 		public async Task<IRootResourceObject> PutAsync<T>(Uri uri, T data)
 		{
 			var backup = OverrideAcceptHeaders();
-			var response = await HttpClient.PutAsJsonAsync(uri, data);
+			var response = await _httpClient.PutAsJsonAsync(uri, data);
 
 			RestoreAcceptHeaders(backup);
 
@@ -55,7 +54,7 @@ namespace HalClient.Net
 		public async Task<IRootResourceObject> GetAsync(Uri uri)
 		{
 			var backup = OverrideAcceptHeaders();
-			var response = await HttpClient.GetAsync(uri);
+			var response = await _httpClient.GetAsync(uri);
 
 			RestoreAcceptHeaders(backup);
 
@@ -65,7 +64,7 @@ namespace HalClient.Net
 		public async Task<IRootResourceObject> DeleteAsync(Uri uri)
 		{
 			var backup = OverrideAcceptHeaders();
-			var response = await HttpClient.DeleteAsync(uri);
+			var response = await _httpClient.DeleteAsync(uri);
 
 			RestoreAcceptHeaders(backup);
 
@@ -75,7 +74,7 @@ namespace HalClient.Net
 		public async Task<IRootResourceObject> SendAsync(HttpRequestMessage request)
 		{
 			var backup = OverrideAcceptHeaders();
-			var response = await HttpClient.SendAsync(request);
+			var response = await _httpClient.SendAsync(request);
 
 			RestoreAcceptHeaders(backup);
 
@@ -84,7 +83,7 @@ namespace HalClient.Net
 
 		public IRootResourceObject CachedApiRootResource { get; set; }
 
-		public INonParsingHttpClient HttpClient { get; }
+		public HttpClient HttpClient => _httpClient;
 
 		private void RestoreAcceptHeaders(IEnumerable<MediaTypeWithQualityHeaderValue> backup)
 		{

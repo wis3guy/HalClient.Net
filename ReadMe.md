@@ -358,7 +358,7 @@ public class FakeResponseHandler : DelegatingHandler
 
 var custom = new FakeResponseHandler();
 
-custom(new Uri("http://example.org/test"), new HttpResponseMessage(HttpStatusCode.OK));
+custom.AddFakeResponse(new Uri("http://example.org/test"), new HttpResponseMessage(HttpStatusCode.OK));
 
 using (var client = factory.CreateClient(custom))
 {

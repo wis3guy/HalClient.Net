@@ -62,6 +62,7 @@
     <Compile Include="Parser\EmbeddedResourceObject.cs" />
     <Compile Include="Parser\HalJsonParseResult.cs" />
     <Compile Include="Parser\IEmbeddedResourceObject.cs" />
+    <Compile Include="Parser\IHaveCustomAttributes.cs" />
     <Compile Include="Parser\ILinkObject.cs" />
     <Compile Include="Parser\IResourceObject.cs" />
     <Compile Include="Parser\IRootResourceObject.cs" />

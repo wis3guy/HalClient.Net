@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Tavis.UriTemplates;
 
 namespace HalClient.Net.Parser
@@ -15,8 +16,10 @@ namespace HalClient.Net.Parser
 		public Uri Profile { get; private set; }
 		public string Title { get; set; }
 		public string HrefLang { get; set; }
-		
-		public ILinkObject ResolveTemplated(Func<UriTemplate, string> hrefResolver)
+	    public IDictionary<string, object> CustomAttributes { get; private set; } = new Dictionary<string, object>();
+
+
+        public ILinkObject ResolveTemplated(Func<UriTemplate, string> hrefResolver)
 		{
 			if (!Templated)
 				throw new InvalidOperationException("Cannot resolve a non-Templated link");
@@ -33,7 +36,8 @@ namespace HalClient.Net.Parser
 				Name = Name,
 				Profile = Profile,
 				Title = Title,
-				Type = Type
+				Type = Type,
+                CustomAttributes = CustomAttributes
 			};
 
 			link.SetHref(href);

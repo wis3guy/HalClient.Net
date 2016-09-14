@@ -103,8 +103,23 @@ namespace HalClient.Net.Tests
 		}]
 	}
 }";
+        private const string JsonCustomLinkAttributes = @"
+{
+	""_links"": {
+		""self"": { ""href"": ""/orders"" },
+        ""home"": { 
+            ""href"": ""/home"", 
+            ""tags"": [""bookmark"", ""info""],
+            ""other"": ""test""
+        },
+		""curies"": [{ ""name"": ""ea"", ""href"": ""http://example.com/docs/rels/{rel}"", ""templated"": true }],
+	},
+	""currentlyProcessing"": 14,
+	""shippedToday"": 20,
+	""_embedded"": null
+}";
 
-		private readonly HalJsonParser _sut = new HalJsonParser();
+        private readonly HalJsonParser _sut = new HalJsonParser();
 
 		[Fact]
 		public void EmbeddedParsing_ParsesTheCorrectNumberOfRels()
@@ -227,5 +242,16 @@ namespace HalClient.Net.Tests
 
 			Assert.Equal(2, result.EmbeddedResources.Count());
 		}
-	}
+
+        [Fact]
+        public void LinksParsing_ParsesLinksWithCustomAttributes()
+        {
+            var result = _sut.Parse(JsonCustomLinkAttributes);
+
+            var homeLink = result.Links.Single(x => x.Rel == "home");
+
+            Assert.Equal(new[] { "bookmark", "info" }, homeLink.CustomAttributes["tags"]);
+            Assert.Equal("test", homeLink.CustomAttributes["other"]);
+        }
+    }
 }

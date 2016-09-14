@@ -3,7 +3,7 @@ using Tavis.UriTemplates;
 
 namespace HalClient.Net.Parser
 {
-	public interface ILinkObject : IHaveLinkRelation
+	public interface ILinkObject : IHaveLinkRelation, IHaveCustomAttributes
 	{
 		Uri Href { get; }
 		bool Templated { get; }

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -124,9 +125,12 @@ namespace HalClient.Net.Parser
 					case "hreflang":
 						link.HrefLang = value;
 						break;
-					default:
-						throw new NotSupportedException("Unsupported link attribute encountered: " + attribute);
-				}
+                    default:
+                        if(link.CustomAttributes.ContainsKey(attribute))
+                            throw new NotSupportedException($"Custom link attribute '{attribute}' is defined more than once");
+                        link.CustomAttributes.Add(attribute, ParseCustomValue(inner.Value));
+                        break;
+                }
 			}
 
 			if (link.Templated)
@@ -137,7 +141,15 @@ namespace HalClient.Net.Parser
 			return link;
 		}
 
-		private static IEnumerable<T> ParseObjectOrArrayOfObjects<T>(JObject outer, Func<JObject, string, T> factory)
+        private static object ParseCustomValue(JToken customAttribute)
+        {
+            if (customAttribute.Type == JTokenType.Array)
+                return customAttribute.Children().Select(x => x.Value<string>()).ToArray();
+            else
+                return customAttribute.Value<string>();
+        }
+
+        private static IEnumerable<T> ParseObjectOrArrayOfObjects<T>(JObject outer, Func<JObject, string, T> factory)
 		{
 			foreach (var inner in outer.Properties())
 			{

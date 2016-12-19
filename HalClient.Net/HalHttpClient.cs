@@ -121,7 +121,7 @@ namespace HalClient.Net
 
 			if (response.IsSuccessStatusCode)
 			{
-				if (response.StatusCode == HttpStatusCode.NoContent)
+				if ((response.StatusCode == HttpStatusCode.NoContent) || (response.StatusCode == HttpStatusCode.NotModified))
 					return new RootResourceObject();
 
 				if (string.IsNullOrEmpty(mediatype))

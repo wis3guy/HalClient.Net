@@ -17,7 +17,6 @@ namespace HalClient.Net
 			var mediaType = response.Content.Headers.ContentType.MediaType;
 
 			IsHalResponse = mediaType.Equals(MediaType.ApplicationHalPlusJson, StringComparison.OrdinalIgnoreCase);
-			Resource = new RootResourceObject();
 		}
 
 		public HttpResponseMessage Message { get; private set; }
@@ -43,6 +42,10 @@ namespace HalClient.Net
 					var result = parser.Parse(content);
 
 					message.Resource = new RootResourceObject(result);
+				}
+				else
+				{
+					message.Resource = new RootResourceObject();
 				}
 			}
 

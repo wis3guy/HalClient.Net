@@ -44,7 +44,9 @@ namespace HalClient.Net
 			if (config.BaseAddress == null)
 				throw new InvalidOperationException("The root resource can only be requested for caching if the BaseAddress of the client is initialized in the Configure method of the factory.");
 
-			return await client.GetAsync(config.BaseAddress).ConfigureAwait(false);
+			var message = await client.GetAsync(config.BaseAddress).ConfigureAwait(false);
+
+			return message.Resource;
 		}
 
 		public IHalHttpClient CreateClient()

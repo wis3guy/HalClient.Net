@@ -9,5 +9,6 @@ namespace HalClient.Net
 		long MaxResponseContentBufferSize { get; set; }
 		TimeSpan Timeout { get; set; }
 		HttpRequestHeaders Headers { get; }
+		bool AutoFollowRedirects { get; set; }
 	}
 }

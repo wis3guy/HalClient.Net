@@ -7,11 +7,11 @@ namespace HalClient.Net
 {
 	public interface IHalHttpClient : IDisposable
 	{
-		Task<IRootResourceObject> PostAsync<T>(Uri uri, T data);
-		Task<IRootResourceObject> PutAsync<T>(Uri uri, T data);
-		Task<IRootResourceObject> GetAsync(Uri uri);
-		Task<IRootResourceObject> DeleteAsync(Uri uri);
-		Task<IRootResourceObject> SendAsync(HttpRequestMessage request);
+		Task<IHalHttpResponseMessage> PostAsync<T>(Uri uri, T data);
+		Task<IHalHttpResponseMessage> PutAsync<T>(Uri uri, T data);
+		Task<IHalHttpResponseMessage> GetAsync(Uri uri);
+		Task<IHalHttpResponseMessage> DeleteAsync(Uri uri);
+		Task<IHalHttpResponseMessage> SendAsync(HttpRequestMessage request);
 		IRootResourceObject CachedApiRootResource { get; }
 		HttpClient HttpClient { get; }
 	}

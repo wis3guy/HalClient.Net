@@ -1,34 +1,27 @@
 using System;
-using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using HalClient.Net.Parser;
 
 namespace HalClient.Net
 {
-	internal class HalHttpResponseMessage : IHalHttpResponseMessage
+	internal class HalHttpResponseMessage : IHalHttpResponseMessage, IDisposable
 	{
 		private HalHttpResponseMessage(HttpResponseMessage response)
 		{
-			StatusCode = response.StatusCode;
-			Location = response.Headers.Location;
-			IsSuccessStatusCode = response.IsSuccessStatusCode;
-			ReasonPhrase = response.ReasonPhrase;
+			Message = response;
 
 			if (response.Content.Headers.ContentType == null)
 				return;
 
-			Mediatype = response.Content.Headers.ContentType.MediaType;
-			IsHalResponse = Mediatype.Equals(MediaType.ApplicationHalPlusJson, StringComparison.OrdinalIgnoreCase);
+			var mediaType = response.Content.Headers.ContentType.MediaType;
+
+			IsHalResponse = mediaType.Equals(MediaType.ApplicationHalPlusJson, StringComparison.OrdinalIgnoreCase);
+			Resource = new RootResourceObject();
 		}
 
-		public string ReasonPhrase { get; }
-		public bool IsSuccessStatusCode { get; }
-		public Uri Location { get; }
-		public HttpStatusCode StatusCode { get; }
-		public string Mediatype { get; }
+		public HttpResponseMessage Message { get; private set; }
 		public bool IsHalResponse { get; }
-		public string Content { get; private set; }
 		public IRootResourceObject Resource { get; private set; }
 
 		public static async Task<IHalHttpResponseMessage> CreateAsync(HttpResponseMessage response, IHalJsonParser parser)
@@ -39,18 +32,44 @@ namespace HalClient.Net
 			if (parser == null)
 				throw new ArgumentNullException(nameof(parser));
 
-			var message = new HalHttpResponseMessage(response)
-			{
-				Content = await response.Content.ReadAsStringAsync()
-			};
-
+			var message = new HalHttpResponseMessage(response);
+			
 			if (message.IsHalResponse)
 			{
-				var result = parser.Parse(message.Content);
-				message.Resource = new RootResourceObject(result);
+				var content = await response.Content.ReadAsStringAsync();
+
+				if (content.Length > 0)
+				{
+					var result = parser.Parse(content);
+
+					message.Resource = new RootResourceObject(result);
+				}
 			}
 
 			return message;
+		}
+
+		public void Dispose()
+		{
+			Dispose(true);
+			GC.SuppressFinalize(this);
+		}
+
+		protected virtual void Dispose(bool disposing)
+		{
+			if (!disposing)
+				return;
+
+			if (Message == null)
+				return;
+
+			Message.Dispose();
+			Message = null;
+		}
+
+		~HalHttpResponseMessage()
+		{
+			Dispose(false);
 		}
 	}
 }

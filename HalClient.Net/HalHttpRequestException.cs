@@ -1,18 +1,19 @@
 using System;
+using System.Net;
+using HalClient.Net.Parser;
 
 namespace HalClient.Net
 {
 	[Serializable]
 	public class HalHttpRequestException : Exception
 	{
-		public HalHttpRequestException(IHalHttpResponseMessage message) : base(message.ReasonPhrase)
+		public HalHttpRequestException(HttpStatusCode statusCode, string reason, IRootResourceObject resource = null)
+			: base($"{(int)statusCode} ({reason})")
 		{
-			if (message == null)
-				throw new ArgumentNullException(nameof(message));
-
-			ResponseMessage = message;
+			StatusCode = statusCode;
+			Resource = resource;
 		}
-
-		public IHalHttpResponseMessage ResponseMessage { get; }
+		public HttpStatusCode StatusCode { get; }
+		public IRootResourceObject Resource { get; }
 	}
 }

@@ -92,7 +92,7 @@ namespace HalClient.Net
 				Configuration.Headers.Accept.Add(headerValue);
 		}
 
-		private MediaTypeWithQualityHeaderValue[] OverrideAcceptHeaders()
+		private IEnumerable<MediaTypeWithQualityHeaderValue> OverrideAcceptHeaders()
 		{
 			var backup = Configuration.Headers.Accept.ToArray();
 
@@ -112,10 +112,10 @@ namespace HalClient.Net
 
 			var message = await HalHttpResponseMessage.CreateAsync(response, _parser);
 
-			if (message.IsSuccessStatusCode)
+			if (response.IsSuccessStatusCode || !Configuration.ThrowOnError)
 				return message;
 
-			throw new HalHttpRequestException(message);
+			throw new HalHttpRequestException(response.StatusCode, response.ReasonPhrase, message.Resource);
 		}
 
 		public void Dispose()
@@ -134,6 +134,11 @@ namespace HalClient.Net
 
 			_httpClient.Dispose();
 			_httpClient = null;
+		}
+
+		~HalHttpClient()
+		{
+			Dispose(false);
 		}
 	}
 }

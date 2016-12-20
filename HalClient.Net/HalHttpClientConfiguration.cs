@@ -12,6 +12,7 @@ namespace HalClient.Net
 		{
 			_httpClient = httpClient;
 			AutoFollowRedirects = true;
+			ThrowOnError = true;
 		}
 
 		public Uri BaseAddress
@@ -33,6 +34,7 @@ namespace HalClient.Net
 		}
 
 		public bool AutoFollowRedirects { get; set; }
+		public bool ThrowOnError { get; set; }
 
 		public HttpRequestHeaders Headers => _httpClient.DefaultRequestHeaders;
 	}

@@ -155,6 +155,8 @@ The following options can be configured:
 `MaxResponseContentBufferSize` | Exposes the `MaxResponseContentBufferSize` property of the underlying `HttpClient` instance.
 `Timeout` | Exposes the `Timeout ` property of the underlying `HttpClient` instance.
 `ApiRootResourceCachingBehavior ` | Tells the `HalHttpClientFactory` wether or not the API's root resource should be cached.
+`ThrowOnError` | Wether a `HalHttpRequestException` should be thrown upon receiving a non-success response from the server. The default value is true.
+`AutoFollowRedirects` | Wether the client should automatically follow (ie. perform a subsequent GET request) in case the server returns either an HTTP 302 or 303 status code. The default value is true.
 
 > Note that, whatever `Accept` header you configure, the value will be overridden and set to `application/hal+json` unless you communicate using the `IHalHttpClient.HttpClient`.
 

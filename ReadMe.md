@@ -32,20 +32,26 @@ Within your code, you can now use the factory to create your clients as follows:
 ```c#
 using (var client = factory.CreateClient())
 {
-	var resource = await client.GetAsync(new Uri("http://example.com/orders"));
-
-	// get the self link of the root resource
-	var selfUri = resource.Links["self"].First().Href;
+	using(var response = await client.GetAsync(new Uri("http://example.com/orders")))
+	{
+		if (response.IsHalResponse)
+		{
+			// get the self link of the root resource
+			var selfUri = response.Resource.Links["self"].First().Href;
 	
-	// get the order dates of all embedded order resources
-	var orderDates = resource.Embedded["example:order"].Select(x => x.State["Date"].Value);
+			// get the order dates of all embedded order resources
+			var orderDates = response.Resource.Embedded["example:order"].Select(x => x.State["Date"].Value);
 	
-	// automatically resolve the documentation uri for a named link relation based on curies
-	var documentationUri = resource.GetDocumentationUri(resource.Links["address:invoice"].First());
+			// automatically resolve the documentation uri for a named link relation based on curies
+			var documentationUri = response.Resource.GetDocumentationUri(resource.Links["address:invoice"].First());
+		}
+	}
 }
 ```
 
-> Note that the client is disposable!
+> Note that both the client and the response are disposable!
+
+Depending on how you set the `ThrowOnError` (default value is `true)`flag in the configuration, be sure to check the `response.Message.IsSuccessStatusCode` before deciding what to do with the returned information.
 
 ###Working with `ILinkObject` instances
 After parsing the `application/hal+json` response from the API, the returned resource contains a dictionary of links as they were encounteres in the `_links` property of the resource. The key in this dictionary is the link's `rel`, the value of each pair in the dictionary, is an `IEnumerable<ILinkObject>`. The reason for this being an enumerable is that the response might contain multiple links with the same `rel` attribute.
@@ -149,6 +155,8 @@ The following options can be configured:
 `MaxResponseContentBufferSize` | Exposes the `MaxResponseContentBufferSize` property of the underlying `HttpClient` instance.
 `Timeout` | Exposes the `Timeout ` property of the underlying `HttpClient` instance.
 `ApiRootResourceCachingBehavior ` | Tells the `HalHttpClientFactory` wether or not the API's root resource should be cached.
+`ThrowOnError` | Wether a `HalHttpRequestException` should be thrown upon receiving a non-success response from the server. The default value is true.
+`AutoFollowRedirects` | Wether the client should automatically follow (ie. perform a subsequent GET request) in case the server returns either an HTTP 302 or 303 status code. The default value is true.
 
 > Note that, whatever `Accept` header you configure, the value will be overridden and set to `application/hal+json` unless you communicate using the `IHalHttpClient.HttpClient`.
 
@@ -166,7 +174,7 @@ public class CustomHalHttpClient : IHalHttpClient
 		_decorated = decorated;
 	}
 
-	public Task<IRootResourceObject> PostAsync<T>(Uri uri, T data)
+	public Task<IHalHttpResponseMessage> PostAsync<T>(Uri uri, T data)
 	{
 		//
 		// do something fancy with the uri and/or data
@@ -179,28 +187,28 @@ public class CustomHalHttpClient : IHalHttpClient
 		//
 	}
 
-	public Task<IRootResourceObject> PutAsync<T>(Uri uri, T data)
+	public Task<IHalHttpResponseMessage> PutAsync<T>(Uri uri, T data)
 	{
 		//
 		// Custom code might go here
 		//
 	}
 
-	public Task<IRootResourceObject> GetAsync(Uri uri)
+	public Task<IHalHttpResponseMessage> GetAsync(Uri uri)
 	{
 		//
 		// Custom code might go here
 		//
 	}
 
-	public Task<IRootResourceObject> DeleteAsync(Uri uri)
+	public Task<IHalHttpResponseMessage> DeleteAsync(Uri uri)
 	{
 		//
 		// Custom code might go here
 		//
 	}
 
-	public Task<IRootResourceObject> SendAsync(HttpRequestMessage request)
+	public Task<IHalHttpResponseMessage> SendAsync(HttpRequestMessage request)
 	{
 		//
 		// Custom code might go here

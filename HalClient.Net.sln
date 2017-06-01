@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.23107.0
+# Visual Studio 15
+VisualStudioVersion = 15.0.26430.6
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HalClient.Net", "HalClient.Net\HalClient.Net.csproj", "{741D356B-9F70-428B-95A7-CDE0A66028CD}"
 EndProject
@@ -27,6 +27,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Nuget Package", "Nuget Pack
 		HalClient.Net\tools\install.ps1 = HalClient.Net\tools\install.ps1
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HalClient.NetStandard", "HalClient.NetStandard\HalClient.NetStandard.csproj", "{BF751ABD-D7E7-4930-8180-43E51C789167}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -41,6 +43,10 @@ Global
 		{13C29969-0993-4251-A237-5EC83CDE9EF9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{13C29969-0993-4251-A237-5EC83CDE9EF9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{13C29969-0993-4251-A237-5EC83CDE9EF9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BF751ABD-D7E7-4930-8180-43E51C789167}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BF751ABD-D7E7-4930-8180-43E51C789167}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BF751ABD-D7E7-4930-8180-43E51C789167}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BF751ABD-D7E7-4930-8180-43E51C789167}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

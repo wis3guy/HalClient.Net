@@ -248,37 +248,21 @@ public class CustomHalHttpClientFactory : HalHttpClientFactory
 ```
 
 ### I want to pass an adhoc context object to my `Configure` and/or `Decorate` overrides
-There are scenarios where you might need to pass a context object from the code calling `HalHttpClientFactory.Create()` to the custom `Configure` and/or `Decorate` overrides of you custom factory. This is typically useful when dealing with remote use impersonation, where your client makes API requests on behalf of a remote user.
+There are scenarios where you might need to pass a context object from the code calling `HalHttpClientFactory.Create()` to your custom `Configure` and/or `Decorate` overrides on you custom factory. This is typically useful when dealing with remote user impersonation, where your client makes API requests on behalf of a remote user.
 
 To help you deal with such situations, there is an abstract generic `HalHttpClientFactoryBase<T>` class from which you can derive your custom factory.
 
-Note that the abstract generic `HalHttpClientFactoryBase<T>` class derives from the `HalHttpClientFactory` class, and thus allows for the same overrides.
-
 ```c#
-public class CustomHalHttpClientFactory : HalHttpClientFactoryBase<string>
+public class CustomHalHttpClientFactory : HalHttpClientFactoryWithContext<string>
 {
 	public CustomHalHttpClientFactory(IHalJsonParser parser) : base(parser)
 	{
-	}
-
-	protected override void Configure(IHalHttpClientConfiguration config)
-	{
-		//
-		// Custom Configure, in case a context was *not* specified in the CreateClient() call
-		//
 	}
 
 	protected override void Configure(IHalHttpClientConfiguration config, string context)
 	{
 		//
 		// Custom Configure, in case a context was specified in the CreateClient() call
-		//
-	}
-
-	protected override IHalHttpClient Decorate(IHalHttpClient original)
-	{
-		//
-		// Custom Decorate, in case a context was *not* specified in the CreateClient() call
 		//
 	}
 

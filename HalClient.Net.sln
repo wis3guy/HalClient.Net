@@ -21,6 +21,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{F93F8F5D
 		HalClient.Net.nuspec = HalClient.Net.nuspec
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HalClient.Portable.Tests", "HalClient.Portable.Tests\HalClient.Portable.Tests.csproj", "{B5EE5558-F375-498D-9575-E03CCFB5755F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{FBB9507B-1262-4C42-80C8-83E0356582B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FBB9507B-1262-4C42-80C8-83E0356582B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FBB9507B-1262-4C42-80C8-83E0356582B5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B5EE5558-F375-498D-9575-E03CCFB5755F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B5EE5558-F375-498D-9575-E03CCFB5755F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B5EE5558-F375-498D-9575-E03CCFB5755F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B5EE5558-F375-498D-9575-E03CCFB5755F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

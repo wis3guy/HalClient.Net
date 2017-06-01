@@ -15,7 +15,7 @@ namespace HalClient.Net.Parser
 		public Uri Profile { get; private set; }
 		public string Title { get; set; }
 		public string HrefLang { get; set; }
-		
+
 		public ILinkObject ResolveTemplated(Func<UriTemplate, string> hrefResolver)
 		{
 			if (!Templated)
@@ -65,7 +65,11 @@ namespace HalClient.Net.Parser
 			{
 				return new Uri(value, kind);
 			}
+#if !PORTABLE
 			catch (UriFormatException)
+#else
+			catch (FormatException)
+#endif
 			{
 				return null;
 			}

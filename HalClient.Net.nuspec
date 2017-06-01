@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<package >
+	<metadata>
+		<id>HalClient.Net</id>
+		<version>3.0.0</version>
+		<description>Specialized http client for communicating with API's that support the HAL media type (https://github.com/wis3guy/HalClient.Net)</description>
+		<authors>Geoffrey Braaf, WIS3GUY.NET</authors>		
+		<licenseUrl>https://github.com/wis3guy/HalClient.Net/blob/master/Licence.md</licenseUrl>
+		<projectUrl>https://github.com/wis3guy/HalClient.Net</projectUrl>
+		<iconUrl>https://github.com/wis3guy/HalClient.Net/blob/master/logo.png?raw=true</iconUrl>
+		<requireLicenseAcceptance>false</requireLicenseAcceptance>		
+		<copyright>Copyright (C) Geoffrey Braaf, WIS3GUY.NET</copyright>
+		<tags>HttpClient Hypermedia Json HAL</tags>
+		<dependencies>
+			<dependency id="Newtonsoft.Json" version="10.0.2"/>
+			<dependency id="System.Net.Http" version="4.3.2"/>
+			<dependency id="Tavis.UriTemplates" version="1.1.1"/>
+		</dependencies>
+	</metadata>
+	<files>
+		<file src="lib\**\HalClient.Net.dll" target="lib" />
+		<file src="lib\**\HalClient.Net.pdb" target="lib" />
+	</files>
+</package>

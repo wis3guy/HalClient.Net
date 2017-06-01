@@ -6,7 +6,7 @@ namespace HalClient.Net
 {
 	public class HalHttpClientConfiguration : IHalHttpClientConfiguration
 	{
-		readonly HttpClient _httpClient;
+		private readonly HttpClient _httpClient;
 
 		public HalHttpClientConfiguration(HttpClient httpClient)
 		{
@@ -17,20 +17,20 @@ namespace HalClient.Net
 
 		public Uri BaseAddress
 		{
-			get { return _httpClient.BaseAddress; }
-			set { _httpClient.BaseAddress = value; }
+			get => _httpClient.BaseAddress;
+			set => _httpClient.BaseAddress = value;
 		}
 
 		public long MaxResponseContentBufferSize
 		{
-			get { return _httpClient.MaxResponseContentBufferSize; }
-			set { _httpClient.MaxResponseContentBufferSize = value; }
+			get => _httpClient.MaxResponseContentBufferSize;
+			set => _httpClient.MaxResponseContentBufferSize = value;
 		}
 
 		public TimeSpan Timeout
 		{
-			get { return _httpClient.Timeout; }
-			set { _httpClient.Timeout = value; }
+			get => _httpClient.Timeout;
+			set => _httpClient.Timeout = value;
 		}
 
 		public bool AutoFollowRedirects { get; set; }

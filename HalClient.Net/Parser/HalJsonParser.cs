@@ -72,9 +72,7 @@ namespace HalClient.Net.Parser
 						case "_links":
 						case "_embedded":
 							if (inner.Value.Type != JTokenType.Null)
-							{
 								throw new FormatException(string.Format("Invalid value for {0}: {1}", inner.Name, value));
-							}
 							break;
 						default:
 							state.Add(new StateValue(inner.Name, value, type));

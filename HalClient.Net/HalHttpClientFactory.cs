@@ -7,46 +7,12 @@ namespace HalClient.Net
 {
 	public class HalHttpClientFactory : IHalHttpClientFactory
 	{
-		private IRootResourceObject _cachedApiRootResource;
-
 		protected readonly IHalJsonParser Parser;
+		private IRootResourceObject _cachedApiRootResource;
 
 		public HalHttpClientFactory(IHalJsonParser parser)
 		{
-			if (parser == null)
-				throw new ArgumentNullException(nameof(parser));
-
-			Parser = parser;
-		}
-
-		protected virtual void Configure(IHalHttpClientConfiguration config)
-		{
-			// Do nothing by default ...
-		}
-
-		protected virtual IHalHttpClient Decorate(IHalHttpClient original)
-		{
-			return original; // return original by default ...
-		}
-
-		protected virtual HttpClient GetHttpClient()
-		{
-			return new HttpClient(new HttpClientHandler { AllowAutoRedirect = false });
-		}
-
-		protected virtual HttpClient GetHttpClient(HttpMessageHandler httpMessageHandler)
-		{
-			return new HttpClient(httpMessageHandler);
-		}
-
-		protected static async Task<IRootResourceObject> GetFreshRootResourceAsync(IHalHttpClient client, IHalHttpClientConfiguration config)
-		{
-			if (config.BaseAddress == null)
-				throw new InvalidOperationException("The root resource can only be requested for caching if the BaseAddress of the client is initialized in the Configure method of the factory.");
-
-			var message = await client.GetAsync(config.BaseAddress).ConfigureAwait(false);
-
-			return message.Resource;
+			Parser = parser ?? throw new ArgumentNullException(nameof(parser));
 		}
 
 		public IHalHttpClient CreateClient()
@@ -86,6 +52,36 @@ namespace HalClient.Net
 		public Task<IHalHttpClient> CreateClientAsync(HttpClient httpClient, CachingBehavior apiRootCachingBehavior = CachingBehavior.Never)
 		{
 			return CreateHalHttpClientAsync(httpClient, apiRootCachingBehavior);
+		}
+
+		protected virtual void Configure(IHalHttpClientConfiguration config)
+		{
+			// Do nothing by default ...
+		}
+
+		protected virtual IHalHttpClient Decorate(IHalHttpClient original)
+		{
+			return original; // return original by default ...
+		}
+
+		protected virtual HttpClient GetHttpClient()
+		{
+			return new HttpClient(new HttpClientHandler {AllowAutoRedirect = false});
+		}
+
+		protected virtual HttpClient GetHttpClient(HttpMessageHandler httpMessageHandler)
+		{
+			return new HttpClient(httpMessageHandler);
+		}
+
+		protected static async Task<IRootResourceObject> GetFreshRootResourceAsync(IHalHttpClient client, IHalHttpClientConfiguration config)
+		{
+			if (config.BaseAddress == null)
+				throw new InvalidOperationException("The root resource can only be requested for caching if the BaseAddress of the client is initialized in the Configure method of the factory.");
+
+			var message = await client.GetAsync(config.BaseAddress).ConfigureAwait(false);
+
+			return message.Resource;
 		}
 
 		private async Task<IHalHttpClient> CreateHalHttpClientAsync(HttpClient httpClient, CachingBehavior apiRootCachingBehavior)

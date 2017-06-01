@@ -1,0 +1,11 @@
+﻿{
+  "supports": {},
+  "dependencies": {
+    "Newtonsoft.Json": "10.0.2",
+    "System.Net.Http": "4.3.2",
+    "Tavis.UriTemplates": "1.1.1"
+  },
+  "frameworks": {
+    "netstandard1.1": {}
+  }
+}

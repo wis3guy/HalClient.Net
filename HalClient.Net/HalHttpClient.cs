@@ -4,37 +4,32 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Text;
 using System.Threading.Tasks;
 using HalClient.Net.Parser;
+using Newtonsoft.Json;
 
 namespace HalClient.Net
 {
 	internal class HalHttpClient : IHalHttpClient
 	{
 		private readonly IHalJsonParser _parser;
-		private HttpClient _httpClient;
 
 		internal HalHttpClient(IHalJsonParser parser, HttpClient httpClient)
 		{
-			if (parser == null)
-				throw new ArgumentNullException(nameof(parser));
-
-			if (httpClient == null)
-				throw new ArgumentNullException(nameof(httpClient));
-
-			_parser = parser;
-			_httpClient = httpClient;
+			_parser = parser ?? throw new ArgumentNullException(nameof(parser));
+			HttpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
 
 			Configuration = new HalHttpClientConfiguration(httpClient);
 		}
 
 		public IHalHttpClientConfiguration Configuration { get; }
-		
+
 		public async Task<IHalHttpResponseMessage> PostAsync<T>(Uri uri, T data)
 		{
 			var backup = OverrideAcceptHeaders();
-			var response = await _httpClient.PostAsJsonAsync(uri, data);
-			
+			var response = await HttpClient.PostAsync(uri, new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json"));
+
 			RestoreAcceptHeaders(backup);
 
 			return await ProcessResponseMessage(response);
@@ -43,7 +38,7 @@ namespace HalClient.Net
 		public async Task<IHalHttpResponseMessage> PutAsync<T>(Uri uri, T data)
 		{
 			var backup = OverrideAcceptHeaders();
-			var response = await _httpClient.PutAsJsonAsync(uri, data);
+			var response = await HttpClient.PutAsync(uri, new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json"));
 
 			RestoreAcceptHeaders(backup);
 
@@ -53,7 +48,7 @@ namespace HalClient.Net
 		public async Task<IHalHttpResponseMessage> GetAsync(Uri uri)
 		{
 			var backup = OverrideAcceptHeaders();
-			var response = await _httpClient.GetAsync(uri);
+			var response = await HttpClient.GetAsync(uri);
 
 			RestoreAcceptHeaders(backup);
 
@@ -63,7 +58,7 @@ namespace HalClient.Net
 		public async Task<IHalHttpResponseMessage> DeleteAsync(Uri uri)
 		{
 			var backup = OverrideAcceptHeaders();
-			var response = await _httpClient.DeleteAsync(uri);
+			var response = await HttpClient.DeleteAsync(uri);
 
 			RestoreAcceptHeaders(backup);
 
@@ -73,7 +68,7 @@ namespace HalClient.Net
 		public async Task<IHalHttpResponseMessage> SendAsync(HttpRequestMessage request)
 		{
 			var backup = OverrideAcceptHeaders();
-			var response = await _httpClient.SendAsync(request);
+			var response = await HttpClient.SendAsync(request);
 
 			RestoreAcceptHeaders(backup);
 
@@ -82,7 +77,13 @@ namespace HalClient.Net
 
 		public IRootResourceObject CachedApiRootResource { get; set; }
 
-		public HttpClient HttpClient => _httpClient;
+		public HttpClient HttpClient { get; private set; }
+
+		public void Dispose()
+		{
+			Dispose(true);
+			GC.SuppressFinalize(this);
+		}
 
 		private void RestoreAcceptHeaders(IEnumerable<MediaTypeWithQualityHeaderValue> backup)
 		{
@@ -105,9 +106,9 @@ namespace HalClient.Net
 		private async Task<IHalHttpResponseMessage> ProcessResponseMessage(HttpResponseMessage response)
 		{
 			if (Configuration.AutoFollowRedirects &&
-			    ((response.StatusCode == HttpStatusCode.Redirect) ||
-			     (response.StatusCode == HttpStatusCode.SeeOther) ||
-			     (response.StatusCode == HttpStatusCode.RedirectMethod)))
+			    (response.StatusCode == HttpStatusCode.Redirect ||
+			     response.StatusCode == HttpStatusCode.SeeOther ||
+			     response.StatusCode == HttpStatusCode.RedirectMethod))
 				return await GetAsync(response.Headers.Location);
 
 			var message = await HalHttpResponseMessage.CreateAsync(response, _parser);
@@ -118,22 +119,16 @@ namespace HalClient.Net
 			throw new HalHttpRequestException(response.StatusCode, response.ReasonPhrase, message.Resource);
 		}
 
-		public void Dispose()
-		{
-			Dispose(true);
-			GC.SuppressFinalize(this);
-		}
-
 		protected virtual void Dispose(bool disposing)
 		{
 			if (!disposing)
 				return;
 
-			if (_httpClient == null)
+			if (HttpClient == null)
 				return;
 
-			_httpClient.Dispose();
-			_httpClient = null;
+			HttpClient.Dispose();
+			HttpClient = null;
 		}
 
 		~HalHttpClient()

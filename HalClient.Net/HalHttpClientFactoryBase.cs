@@ -13,10 +13,6 @@ namespace HalClient.Net
 		{
 		}
 
-		protected abstract void Configure(IHalHttpClientConfiguration config, T context);
-
-		protected abstract IHalHttpClient Decorate(IHalHttpClient original, T context);
-
 		public IHalHttpClient CreateClient(T context)
 		{
 			return CreateHalHttpClient(GetHttpClient(), context);
@@ -58,6 +54,10 @@ namespace HalClient.Net
 
 			return CreateHalHttpClientAsync(GetHttpClient(httpMessageHandler), context, apiRootCachingBehavior);
 		}
+
+		protected abstract void Configure(IHalHttpClientConfiguration config, T context);
+
+		protected abstract IHalHttpClient Decorate(IHalHttpClient original, T context);
 
 		private async Task<IHalHttpClient> CreateHalHttpClientAsync(HttpClient httpClient, T context, CachingBehavior apiRootCachingBehavior)
 		{

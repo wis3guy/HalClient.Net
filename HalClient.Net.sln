@@ -7,27 +7,18 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HalClient.Net", "HalClient.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HalClient.Net.Tests", "HalClient.Net.Tests\HalClient.Net.Tests.csproj", "{13C29969-0993-4251-A237-5EC83CDE9EF9}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{16694209-6171-4CEF-BC87-B98052B97348}"
-	ProjectSection(SolutionItems) = preProject
-		.nuget\NuGet.Config = .nuget\NuGet.Config
-		.nuget\NuGet.exe = .nuget\NuGet.exe
-		.nuget\NuGet.targets = .nuget\NuGet.targets
-	EndProjectSection
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Markdown", "Markdown", "{A0ABF803-D29F-4CAC-9842-6718BB852305}"
 	ProjectSection(SolutionItems) = preProject
 		Licence.md = Licence.md
 		ReadMe.md = ReadMe.md
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Nuget Package", "Nuget Package", "{3E2617A6-85EB-48C6-820D-EC3758A5CC8E}"
-	ProjectSection(SolutionItems) = preProject
-		Build.cmd = Build.cmd
-		HalClient.Net\HalClient.Net.nuspec = HalClient.Net\HalClient.Net.nuspec
-		HalClient.Net\tools\install.ps1 = HalClient.Net\tools\install.ps1
-	EndProjectSection
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HalClient.Portable", "HalClient.Portable\HalClient.Portable.csproj", "{FBB9507B-1262-4C42-80C8-83E0356582B5}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{F93F8F5D-08C6-4EAE-AC2F-6829BF1584E1}"
+	ProjectSection(SolutionItems) = preProject
+		HalClient.Net.nuspec = HalClient.Net.nuspec
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

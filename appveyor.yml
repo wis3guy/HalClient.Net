@@ -1,0 +1,35 @@
+version: 2.0.{build}
+image: Previous Visual Studio 2017
+configuration: Release
+build_script:
+- ps: >-
+    appveyor DownloadFile https://dist.nuget.org/win-x86-commandline/latest/nuget.exe
+
+    nuget restore
+
+
+    msbuild "C:\projects\halclient-net\HalClient.Net.sln" /verbosity:minimal /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll" /p:Configuration=Release
+
+
+    New-Item .\pkg\lib -ItemType directory
+
+    Move-Item -Path .\HalClient.Net\bin\Release -Destination .\pkg\lib\net45
+
+    Move-Item -Path .\HalClient.Portable\bin\Release -Destination .\pkg\lib\netstandard1.1
+
+    Copy-Item -Path .\HalClient.Net.nuspec -Destination .\pkg
+
+
+    Push-Location .\pkg
+
+
+    nuget pack .\HalClient.Net.nuspec
+
+
+    Pop-Location
+artifacts:
+- path: pkg/*.nuspec	
+test:
+  assemblies:
+    only:
+    - HalClient.Net.Tests.dll

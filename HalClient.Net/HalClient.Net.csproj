@@ -45,6 +45,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CachingBehavior.cs" />
+    <Compile Include="HalHttpClientFactoryBase.cs" />
+    <Compile Include="IHalHttpClientFactory.cs" />
     <Compile Include="MediaType.cs" />
     <Compile Include="HalHttpClientFactory.cs" />
     <Compile Include="HalHttpClientConfiguration.cs" />
@@ -60,10 +62,10 @@
     <Compile Include="Parser\IStateValue.cs" />
     <Compile Include="Parser\LinkObject.cs" />
     <Compile Include="Parser\ResourceObjectBase.cs" />
-    <Compile Include="HalHttpClientFactoryBase.cs" />
+    <Compile Include="HalHttpClientFactoryWithContext.cs" />
     <Compile Include="IHalHttpClientConfiguration.cs" />
     <Compile Include="IHalHttpClient.cs" />
-    <Compile Include="IHalHttpClientFactory.cs" />
+    <Compile Include="IHalHttpClientFactoryWithContext.cs" />
     <Compile Include="Parser\IHaveLinkRelation.cs" />
     <Compile Include="Parser\HalJsonParser.cs" />
     <Compile Include="HalHttpClient.cs" />

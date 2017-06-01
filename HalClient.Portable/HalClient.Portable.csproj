@@ -49,6 +49,9 @@
     <Compile Include="..\HalClient.Net\HalHttpClientFactoryBase.cs">
       <Link>HalHttpClientFactoryBase.cs</Link>
     </Compile>
+    <Compile Include="..\HalClient.Net\HalHttpClientFactoryWithContext.cs">
+      <Link>HalHttpClientFactoryWithContext.cs</Link>
+    </Compile>
     <Compile Include="..\HalClient.Net\HalHttpRequestException.cs">
       <Link>HalHttpRequestException.cs</Link>
     </Compile>
@@ -63,6 +66,9 @@
     </Compile>
     <Compile Include="..\HalClient.Net\IHalHttpClientFactory.cs">
       <Link>IHalHttpClientFactory.cs</Link>
+    </Compile>
+    <Compile Include="..\HalClient.Net\IHalHttpClientFactoryWithContext.cs">
+      <Link>IHalHttpClientFactoryWithContext.cs</Link>
     </Compile>
     <Compile Include="..\HalClient.Net\IHalHttpResponseMessage.cs">
       <Link>IHalHttpResponseMessage.cs</Link>

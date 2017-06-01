@@ -28,7 +28,7 @@ build_script:
 
     Pop-Location
 artifacts:
-- path: pkg/*.nuspec	
+- path: pkg/*.nupkg	
 test:
   assemblies:
     only:

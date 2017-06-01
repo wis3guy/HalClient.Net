@@ -22,8 +22,8 @@ namespace HalClient.Net.Parser
 			StateValues = stateValues;
 		}
 
-		public IEnumerable<ILinkObject> Links { get; private set; }
-		public IEnumerable<IEmbeddedResourceObject> EmbeddedResources { get; private set; }
-		public IEnumerable<IStateValue> StateValues { get; private set; }
+		public IEnumerable<ILinkObject> Links { get; }
+		public IEnumerable<IEmbeddedResourceObject> EmbeddedResources { get; }
+		public IEnumerable<IStateValue> StateValues { get; }
 	}
 }

@@ -3,8 +3,8 @@
 namespace HalClient.Net.Parser
 {
 	/// <summary>
-	/// Represents a resource
-	/// <see cref="http://tools.ietf.org/html/draft-kelly-json-hal-06#section-4"/>
+	///     Represents a resource
+	///     <see cref="http://tools.ietf.org/html/draft-kelly-json-hal-06#section-4" />
 	/// </summary>
 	public interface IResourceObject
 	{

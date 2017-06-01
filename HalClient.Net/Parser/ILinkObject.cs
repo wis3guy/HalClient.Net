@@ -14,10 +14,11 @@ namespace HalClient.Net.Parser
 		Uri Profile { get; }
 		string Title { get; }
 		string HrefLang { get; }
+
 		ILinkObject ResolveTemplated(Func<UriTemplate, string> hrefResolver);
-		// FUTURE: Support multiple of these as specified here: http://tools.ietf.org/html/rfc5988#section-5.4 
-		// FUTURE: Curies
-		// FUTURE: Rel as Uri
 		// FUTURE: IANA rels
+		// FUTURE: Rel as Uri
+		// FUTURE: Curies
+		// FUTURE: Support multiple of these as specified here: http://tools.ietf.org/html/rfc5988#section-5.4 
 	}
 }

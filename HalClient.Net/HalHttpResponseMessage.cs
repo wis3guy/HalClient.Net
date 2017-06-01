@@ -19,6 +19,12 @@ namespace HalClient.Net
 			IsHalResponse = mediaType.Equals(MediaType.ApplicationHalPlusJson, StringComparison.OrdinalIgnoreCase);
 		}
 
+		public void Dispose()
+		{
+			Dispose(true);
+			GC.SuppressFinalize(this);
+		}
+
 		public HttpResponseMessage Message { get; private set; }
 		public bool IsHalResponse { get; }
 		public IRootResourceObject Resource { get; private set; }
@@ -32,7 +38,7 @@ namespace HalClient.Net
 				throw new ArgumentNullException(nameof(parser));
 
 			var message = new HalHttpResponseMessage(response);
-			
+
 			if (message.IsHalResponse)
 			{
 				var content = await response.Content.ReadAsStringAsync();
@@ -50,12 +56,6 @@ namespace HalClient.Net
 			}
 
 			return message;
-		}
-
-		public void Dispose()
-		{
-			Dispose(true);
-			GC.SuppressFinalize(this);
 		}
 
 		protected virtual void Dispose(bool disposing)

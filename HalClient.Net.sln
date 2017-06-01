@@ -27,7 +27,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Nuget Package", "Nuget Pack
 		HalClient.Net\tools\install.ps1 = HalClient.Net\tools\install.ps1
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HalClient.NetStandard", "HalClient.NetStandard\HalClient.NetStandard.csproj", "{BF751ABD-D7E7-4930-8180-43E51C789167}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HalClient.Portable", "HalClient.Portable\HalClient.Portable.csproj", "{FBB9507B-1262-4C42-80C8-83E0356582B5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -43,10 +43,10 @@ Global
 		{13C29969-0993-4251-A237-5EC83CDE9EF9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{13C29969-0993-4251-A237-5EC83CDE9EF9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{13C29969-0993-4251-A237-5EC83CDE9EF9}.Release|Any CPU.Build.0 = Release|Any CPU
-		{BF751ABD-D7E7-4930-8180-43E51C789167}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BF751ABD-D7E7-4930-8180-43E51C789167}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{BF751ABD-D7E7-4930-8180-43E51C789167}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BF751ABD-D7E7-4930-8180-43E51C789167}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FBB9507B-1262-4C42-80C8-83E0356582B5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FBB9507B-1262-4C42-80C8-83E0356582B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FBB9507B-1262-4C42-80C8-83E0356582B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FBB9507B-1262-4C42-80C8-83E0356582B5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

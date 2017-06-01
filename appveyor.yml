@@ -33,3 +33,4 @@ test:
   assemblies:
     only:
     - HalClient.Net.Tests.dll
+    - HalClient.Portable.Tests.dll

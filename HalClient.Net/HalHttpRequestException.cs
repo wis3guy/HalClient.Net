@@ -4,6 +4,9 @@ using HalClient.Net.Parser;
 
 namespace HalClient.Net
 {
+#if !PORTABLE
+	[Serializable]
+#endif
 	public class HalHttpRequestException : Exception
 	{
 		public HalHttpRequestException(HttpStatusCode statusCode, string reason, IRootResourceObject resource = null)

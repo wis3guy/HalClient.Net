@@ -76,9 +76,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\HalClient.Portable\HalClient.Portable.csproj">
-      <Project>{fbb9507b-1262-4c42-80c8-83e0356582b5}</Project>
-      <Name>HalClient.Portable</Name>
+    <ProjectReference Include="..\HalClient.Net\HalClient.Net.csproj">
+      <Project>{741d356b-9f70-428b-95a7-cde0a66028cd}</Project>
+      <Name>HalClient.Net</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

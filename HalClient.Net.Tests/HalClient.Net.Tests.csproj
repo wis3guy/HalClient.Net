@@ -1,5 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
+  
+  <Import Project=".\..\HalClient.Net.Build\HalClient.Net.Commons.props" />
+  
   <PropertyGroup>
     <TargetFramework>netcoreapp1.1</TargetFramework>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>

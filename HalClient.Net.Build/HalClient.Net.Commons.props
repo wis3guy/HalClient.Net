@@ -20,8 +20,8 @@
     <RepositoryUrl>$(PackageProjectUrl).git</RepositoryUrl>
   </PropertyGroup>
   <PropertyGroup>
-      <Major>3</Major>
-      <Minor>1</Minor>
+      <Major>4</Major>
+      <Minor>0</Minor>
       <Revision>0</Revision>
 
       <BuildNumber Condition=" '$(APPVEYOR_BUILD_NUMBER)' != '' ">$(APPVEYOR_BUILD_NUMBER)</BuildNumber>
@@ -29,7 +29,7 @@
       <BuildNumber Condition=" '$(BuildNumber)' == '' ">0</BuildNumber>
 
       <!-- Remove for release -->
-      <PrereleaseLabel>-beta</PrereleaseLabel>
+      <!-- <PrereleaseLabel>-beta</PrereleaseLabel> -->
 
       <BuildSuffix Condition=" '$(PrereleaseLabel)' != '' ">$(PrereleaseLabel)-$(BuildNumber)</BuildSuffix>
       <BuildSuffix Condition=" '$(BuildSuffix)' == '' "></BuildSuffix>

@@ -3,7 +3,7 @@
   <Import Project=".\..\HalClient.Net.Build\HalClient.Net.Commons.props" />
   
   <PropertyGroup>
-    <TargetFramework>netcoreapp1.1</TargetFramework>
+    <TargetFrameworks>netcoreapp1.1;net462</TargetFrameworks>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
   

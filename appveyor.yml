@@ -8,7 +8,8 @@ build_script:
 - ps: >-
     dotnet restore
     dotnet build -c Release
-    dotnet pack "$env:APPVEYOR_BUILD_FOLDER\HalClient.Net\HalClient.Net.csproj" -c Release /p:PackageVersion=$env:PACKAGE_VERSION /p:AssemblyVersion=$env:PACKAGE_VERSION /p:Version=$env:PACKAGE_VERSION
+    dotnet pack -c Release /p:PackageVersion=$env:PACKAGE_VERSION /p:AssemblyVersion=$env:PACKAGE_VERSION /p:Version=$env:PACKAGE_VERSION
+    rm *.Tests.nupkg
 test: on
 artifacts:
 - path: '**\*.nupkg'

@@ -5,7 +5,7 @@
 		<version>3.1.0</version>
 		<description>Specialized http client for communicating with API's that support the HAL media type (https://github.com/wis3guy/HalClient.Net)</description>
 		<authors>Geoffrey Braaf, WIS3GUY.NET</authors>		
-		<licenseUrl>https://github.com/wis3guy/HalClient.Net/blob/master/Licence.md</licenseUrl>
+		<license>https://github.com/wis3guy/HalClient.Net/blob/master/Licence.md</license>
 		<projectUrl>https://github.com/wis3guy/HalClient.Net</projectUrl>
 		<iconUrl>https://github.com/wis3guy/HalClient.Net/blob/master/logo.png?raw=true</iconUrl>
 		<requireLicenseAcceptance>false</requireLicenseAcceptance>		

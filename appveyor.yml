@@ -5,9 +5,9 @@ test_script:
   - dotnet restore
   - dotnet test -c Release .\HalClient.Net.Tests\HalClient.Net.Tests.csproj
 build_script:
-  - dotnet restore
-  - dotnet build -c Release
-  - dotnet pack -c Release /p:PackageVersion=$env:PACKAGE_VERSION /p:AssemblyVersion=$env:PACKAGE_VERSION /p:Version=$env:PACKAGE_VERSION
+- ps: dotnet restore
+- ps: dotnet build -c Release
+- ps: dotnet pack -c Release /p:PackageVersion=$env:PACKAGE_VERSION /p:AssemblyVersion=$env:PACKAGE_VERSION /p:Version=$env:PACKAGE_VERSION
 test: on
 artifacts:
 - path: '**\*.nupkg'

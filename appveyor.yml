@@ -8,10 +8,9 @@ build_script:
 - ps: dotnet restore
 - ps: dotnet build -c Release
 - ps: dotnet pack -c Release /p:PackageVersion=$env:PACKAGE_VERSION /p:AssemblyVersion=$env:PACKAGE_VERSION /p:Version=$env:PACKAGE_VERSION
-- ps: rm *.Tests.*.nupkg
 test: on
 artifacts:
-- path: '**\*.nupkg'
+- path: 'HalClient.Net\**\*.nupkg'
 deploy:
 - provider: NuGet
   api_key:

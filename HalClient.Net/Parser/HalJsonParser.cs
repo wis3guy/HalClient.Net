@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -12,10 +13,14 @@ namespace HalClient.Net.Parser
 			if (string.IsNullOrEmpty(json))
 				throw new ArgumentNullException(nameof(json));
 
-			var obj = JObject.Parse(json);
-			var resource = ParseRootResourceObject(obj);
-
-			return resource;
+			using (var stringReader = new StringReader(json))
+			using (var jsonReader = new JsonTextReader(stringReader){ DateParseHandling = DateParseHandling.None })
+			{
+				var obj = JObject.Load(jsonReader);
+				var resource = ParseRootResourceObject(obj);
+				
+				return resource;	
+			}
 		}
 
 		private static HalJsonParseResult ParseRootResourceObject(JObject outer)

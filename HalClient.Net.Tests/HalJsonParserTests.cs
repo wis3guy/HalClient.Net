@@ -227,5 +227,21 @@ namespace HalClient.Net.Tests
 
 			Assert.Equal(2, result.EmbeddedResources.Count());
 		}
+		
+		/// <summary>
+		/// See: https://github.com/wis3guy/HalClient.Net/issues/27
+		/// </summary>
+		[Fact]
+		public void StateParsing_LeavesDatesUntouched()
+		{
+			const string expected = "2019-04-22T20:52:50Z";
+			
+			var json = $"{{'date': '{expected}'}}";
+			var parser = new HalJsonParser();
+			var result = parser.Parse(json);
+			var date = result.StateValues.Single(sv => sv.Name == "date");
+
+			Assert.Equal(date.Value, expected);
+		}
 	}
 }

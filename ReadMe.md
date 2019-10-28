@@ -127,11 +127,11 @@ In some situations, an HAL media type API may respond using a non-HAL content ty
 If you want to configure all instantiated `IHalHttpClient` objects consistently, you should create a custom factory.
 
 ```c#
-public class CustomApiCLientFactory : HalHttpClientFactory
+public class CustomApiClientFactory : HalHttpClientFactory
 {
 	private readonly string _apiKey;
 
-	public CustomApiCLientFactory(IHalJsonParser parser, string apiKey) : base(parser)
+	public CustomApiClientFactory(IHalJsonParser parser, string apiKey) : base(parser)
 	{
 		_apiKey = apiKey;
 	}

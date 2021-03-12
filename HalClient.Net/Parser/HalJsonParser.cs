@@ -112,7 +112,7 @@ namespace HalClient.Net.Parser
 					case "type":
 						link.Type = value;
 						break;
-					case "deprication":
+					case "deprecation":
 						link.SetDeprecation(value);
 						break;
 					case "name":
